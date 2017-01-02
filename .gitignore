@@ -28,4 +28,4 @@
 *.out
 *.app
 /.idea/
-/fortMPP.sh
+*fortMPP.sh
