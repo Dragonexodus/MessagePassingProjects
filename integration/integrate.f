@@ -3,13 +3,13 @@
        double precision pi,a,b,integrateF1
        pi = 3.14159265358979323
        a = 0
-       b = pi
+       b = 1
        size = nprocs ()
        topid = makering (1, size, -1, -1, -1, -1, -1, -1, id, links)
        sum = 0
 
        if(id.eq.0) then
-c todo: check if straight with mod(size,2).eq.0
+c TODO: check if straight with mod(size,2).eq.0
               print*,"integral for f1: " ,integrateF1(size,a,b)                       
        endif
 
@@ -18,10 +18,26 @@ c todo: check if straight with mod(size,2).eq.0
 
        double precision function integrateF1(n,a,b)      
               integer n
-              double precision  a,b,h,f1,clientRes
+              double precision  a,b,h,f2, summe
               h= dble((b-a)/n)
-              clientRes = f1(a)+f1(b)
-              integrateF1 = (h/3)*clientRes
+c              clientRes = f1(a)+f1(b)
+
+              summe = f2(a)
+              print*,"a: ", a ," Summe:", summe
+c TODO sicherheitsabfrage n <=2
+              do i=1,(n-2)
+                     if(mod(i,2).eq.0) then
+                          summe = summe + 2*f2(a)
+                     else
+                          summe = summe + 4*f2(a)
+                     endif
+                     a = a+h    
+                     print*,"a: ", a ," Summe:", summe
+              enddo
+              summe = summe + f2(b)
+              print*,"a: ", a ," Summe:", summe, "f1(b): ", f2(b)
+              
+              integrateF1 = (h/3)*summe
               RETURN
        end           
 
