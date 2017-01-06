@@ -1,33 +1,58 @@
        program integration
        double precision integrateF1, integrateF2, micro
-       integer makehcube, dim, topid, id, start, stop
+       integer makehcube, dim, topid, id, start, stop,f
+       character *100 cArg 
        parameter(dim = 3, micro=10**6)
        integer links(dim), timenowhigh, timediff
-
-c       integer iArg
-c       character cArg
-
-c       iArg = iargc()
-c       call getarg(iArg,cArg)
-c       print*,"iArg: " ,iArg
-c       print*,"cArg: " ,cArg
-
-c      Für Messungen wird 2^n empfohlen
+c default values for the program
+c Für Messungen wird 2^n empfohlen
        n = 2**15
+       f=1
 
+       DO i = 1, iargc()
+              CALL getarg(i, cArg)
+c als Eingaben sollen verarbeitet werden: n, Testfunktion
+              if(i.eq.1)then                     
+                     READ(cArg,*) f        
+              elseif(i.eq.2)then
+                     READ(cArg,*) n
+              endif
+       END DO
+       
        size = nprocs ()
        topid = makehcube(1, dim, -1, -1, -1, -1, -1, -1, id, links)
+       
+       if(id.eq.0)then
+              if(f.eq.3)then
+                     print*,"use f1 and f2 with n:",n
+              elseif(f.eq.1.or.f.eq.2)then
+                     print*,"use f",f," with n:",n
+              else
+                     n = 2**15
+                     f=1
+                     print*,"error-input of function:",f
+                     print*,"use default values, f:",f,"n:",n
+              endif
+       endif
 
-c TODO: read command line flag of used function
-
-
-       if(id.eq.0.and.mod(n,2).eq.0) then
+       if(f.eq.1.and.mod(n,2).eq.0) then
               start = timenowhigh()
               print*,"ID:",id," Pi f1:" ,integrateF1(n)
               stop = timenowhigh()
               print*,"ID:",id," T:", dble(timediff(stop,start)/micro)                     
        endif
-       if(id.eq.1.and.mod(n,2).eq.0) then    
+       if(f.eq.2.and.mod(n,2).eq.0) then    
+              start = timenowhigh()
+              print*,"ID:",id," Pi f2:" ,integrateF2(n)  
+              stop = timenowhigh()
+              print*,"ID:",id," T: ", dble(timediff(stop,start)/micro)                   
+       endif
+c both
+       if(f.eq.3.and.mod(n,2).eq.0) then  
+              start = timenowhigh()
+              print*,"ID:",id," Pi f1:" ,integrateF1(n)
+              stop = timenowhigh()
+              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)    
               start = timenowhigh()
               print*,"ID:",id," Pi f2:" ,integrateF2(n)  
               stop = timenowhigh()
