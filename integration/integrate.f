@@ -1,54 +1,58 @@
        program integration
        double precision integrateF1, integrateF2, micro
-       integer makehcube, dim, topid, id, start, stop,f
-       character *100 cArg 
+       integer makehcube, dim, topid, id, start, stop,f,n,size
+       character *10 cArg 
        parameter(dim = 3, micro=10**6)
        integer links(dim), timenowhigh, timediff
-c default values for the program
-c Für Messungen wird 2^n empfohlen
-       n = 2**15
-       f=1
 
+       f=1
+       n=15
+
+c      read commandline values
        DO i = 1, iargc()
               CALL getarg(i, cArg)
-c als Eingaben sollen verarbeitet werden: n, Testfunktion
               if(i.eq.1)then                     
-                     READ(cArg,*) f        
+                     READ(cArg,*) f
+                     if(f.gt.3.or.f.lt.1)then
+                     print*,"error-input of function:",f
+                            f=1
+                     endif        
               elseif(i.eq.2)then
                      READ(cArg,*) n
+                     if(n.gt.17.or.n.lt.1)then
+                     print*,"error-input of n:",n
+                            n=17
+                     endif
               endif
        END DO
-       
+ 
+       n = 2**n
+
+c      create hcube
        size = nprocs ()
        topid = makehcube(1, dim, -1, -1, -1, -1, -1, -1, id, links)
-       
-       if(id.eq.0)then
-              if(f.eq.3)then
-                     print*,"use f1 and f2 with n:",n
-              elseif(f.eq.1.or.f.eq.2)then
-                     print*,"use f",f," with n:",n
-              else
-                     n = 2**15
-                     f=1
-                     print*,"error-input of function:",f
-                     print*,"use default values, f:",f,"n:",n
-              endif
-       endif
 
-       if(f.eq.1.and.mod(n,2).eq.0) then
+
+c      master
+c      if(id.eq.0)then
+c      führe ersten teil der berechnung aus
+c      slaves
+c      else
+
+c      call wanted functions
+       if(id.eq.0)then
+              print*,"use f",f," with n:",n
+          if(f.eq.1) then
               start = timenowhigh()
               print*,"ID:",id," Pi f1:" ,integrateF1(n)
               stop = timenowhigh()
-              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)                     
-       endif
-       if(f.eq.2.and.mod(n,2).eq.0) then    
+              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
+          elseif(f.eq.2) then    
               start = timenowhigh()
               print*,"ID:",id," Pi f2:" ,integrateF2(n)  
               stop = timenowhigh()
               print*,"ID:",id," T: ", dble(timediff(stop,start)/micro)                   
-       endif
-c both
-       if(f.eq.3.and.mod(n,2).eq.0) then  
+          else 
               start = timenowhigh()
               print*,"ID:",id," Pi f1:" ,integrateF1(n)
               stop = timenowhigh()
@@ -57,17 +61,22 @@ c both
               print*,"ID:",id," Pi f2:" ,integrateF2(n)  
               stop = timenowhigh()
               print*,"ID:",id," T: ", dble(timediff(stop,start)/micro)                   
+          endif
        endif
-
        call freetop (topid)
        end
 
+c      functions
        double precision function integrateF1(n)      
               integer n,exponent
               double precision  a,b,h,summe,step,f1
               parameter ( a = 0, b = 3.14159265358979323)
 
               h= dble((b-a)/n)
+
+c      local_n = n / p
+c      local_a = a + rank * local_n * h;
+c      local_b = local_a + local_n * h;
 
               summe = f1(a)
               step = a + h
