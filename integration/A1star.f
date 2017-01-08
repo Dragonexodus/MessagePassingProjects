@@ -27,30 +27,22 @@ c init star
 
 c integrate
        if(id.eq.0) then
-              call integrateF1(n,id,integral)
-              summe = integral
-         do i=1,(np-1)
-              call recv(topid,links(i),integral,8)
-              summe = summe + integral
-         enddo
-               print*,"Pi Integral:",summe
+          print*,"use f",f," with n:",n
+          call integrate(f,n,id,integral)
+c master part of the integral
+          summe = integral
+          do i=1,(np-1)
+c receive and add all slave parts of the integral
+                 call recv(topid,links(i),integral,8)
+                 summe = summe + integral
+          enddo
+          print*,"Pi Integral:",summe
        else
-              call integrateF1(n,id,integral)
-              call send(topid, link,integral,8)
+c slave part of the integral + send
+           call integrate(f,n,id,integral)
+           call send(topid, link,integral,8)
        endif
 
-c choose f
-c       if(id.eq.0)then
-c              print*,"use f",f," with n:",n
-c          if(f.eq.1) then
-c              call integrateF1(n,id,topid,link,links)
-c          elseif(f.eq.2) then    
-c              call integrateF2(n,id,topid,link,links)   
-c          else 
-c              call integrateF1(n,id,topid,link,links)
-c              call integrateF2(n,id,topid,link,links)
-c          endif
-c       endif
        call freetop (topid)
 
        end
@@ -62,7 +54,7 @@ c       endif
               CALL getarg(i, cArg)
               if(i.eq.1)then                     
                      READ(cArg,*) f
-                     if(f.gt.3.or.f.lt.1)then
+                     if(f.gt.2.or.f.lt.1)then
                             print*,"error-input of function:",f
                             f=1
                      endif        
@@ -74,6 +66,16 @@ c       endif
                      endif
               endif
        END DO
+       end
+
+       subroutine integrate(f,n,id,integral)
+           integer f,n,id
+           double precision integral
+           if(f.eq.1)then
+              call integrateF1(n,id,integral)
+           elseif(f.eq.2)then
+              call integrateF2(n,id,integral)              
+           endif
        end
 
        subroutine integrateF1(n,id,summe)
@@ -114,37 +116,41 @@ c             TODO hier vermutlich noch nicht komplett korrekt wegen Rand..
               return
        end
 
-c       subroutine integrateF2(n,id,topid,link,links)    
-c              integer start,stop,timenowhigh,timediff,n,id,exponent
-c              integer topid,link,links(7)
-c              double precision res,micro,a,b,h,summe,step,f2
-c              parameter(micro=10**6, a = 0, b = 1)
+       subroutine integrateF2(n,id,summe)
+              integer start,stop,timenowhigh,timediff,n,id,exponent,nL
+              double precision a,b,h,summe,step,f2,micro,aL,bL
+              parameter(micro=10**6,a = 0, b = 1)
 
-c              start = timenowhigh()
-c              h= dble((b-a)/n)
+              start = timenowhigh()
 
-c              summe = f2(a)
-c              step = a + h
-c              if(n.gt.2) then
-c                     do i=1,(n-2)
-c                            exponent = mod(i,2) + 1 
-c                            summe = summe + f2(step) * 2**exponent
-c                            step = step + h   
-c                     enddo
-c              endif
-c              summe = summe + f2(b)
-              
-c              res = (h/3)*summe
+              h= dble((b-a)/n)
+              nL = n / nprocs()
+              aL = a + id * nL * h
+              bL = aL + nL * h
 
-c              print*,"ID:",id," Pi f2:" ,res
+c             TODO hier vermutlich noch nicht komplett korrekt wegen Rand..
+              if(id.eq.0)then
+                     summe = f2(a) + f2(b)
+                     step = aL + h
+                     nL = nl-1
+              else
+                     step = aL
+              endif
 
-c              stop = timenowhigh()
-c              print*,"ID:",id," T:", dble(timediff(stop,start)/micro) 
-c        end    
+              do i=1,(nL-1)
+                     exponent = mod(i,2) + 1 
+                     summe = summe + f2(step) * 2**exponent
+                     step = step + h    
+              enddo
 
-c       double precision function f2(x)
-c              double precision x
-c              f2 = dble(4/(1+x**2))
-c              return 
-c       end
+              summe=(h/3)*summe  
+              stop = timenowhigh()
+              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
+       end
+
+       double precision function f2(x)
+              double precision x
+              f2 = dble(4/(1+x**2))
+              return 
+       end
 
