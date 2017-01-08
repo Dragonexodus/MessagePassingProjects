@@ -1,5 +1,4 @@
        program integration
-       character *10 cArg 
        integer newtop,addnewlink,links(7),link
        integer topid, np, nprocs,f,n,id
        double precision summe, integral
@@ -11,97 +10,108 @@
 
        id=myprocid()
        np = nprocs()
-       topid=newtop(np-1)
 
-       call readCL(cArg,f,n)
-       n = 2**n
+c      check processor count
+       if(mod(np,2).eq.0)then
+     
+              topid=newtop(np-1)
 
+              call readCL(f,n)
+              n = 2**n
 c init star
-       if(id.eq.0) then
-         do i=1,(np-1)
-              links(i)=addnewlink(topid,i,1)
-         enddo
-       else
-         link=addnewlink(topid,0,1)
-       endif
-
+              if(id.eq.0) then
+                do i=1,(np-1)
+                     links(i)=addnewlink(topid,i,1)
+                enddo
+              else
+                link=addnewlink(topid,0,1)
+              endif
 c integrate
-       if(id.eq.0) then
-          print*,"use f",f," with n:",n
-          call integrate(f,n,id,integral)
+              if(id.eq.0) then
+                 print*,"use f",f," with n:",n
+                 call startIntegration(f,n,integral)
 c master part of the integral
-          summe = integral
-          do i=1,(np-1)
+                 summe = integral
+                 do i=1,(np-1)
 c receive and add all slave parts of the integral
-                 call recv(topid,links(i),integral,8)
-                 summe = summe + integral
-          enddo
-          print*,"Pi Integral:",summe
-       else
+                        call recv(topid,links(i),integral,8)
+                        summe = summe + integral
+                 enddo
+                 print*,"Pi Integral:",summe
+              else
 c slave part of the integral + send
-           call integrate(f,n,id,integral)
-           call send(topid, link,integral,8)
+                  call startIntegration(f,n,integral)
+                  call send(topid, link,integral,8)
+              endif
+            
+              call freetop (topid)
+       else 
+              if(id.eq.0) then
+                     print*,"ERROR: incorrect number of processors!"
+              endif
        endif
-
-       call freetop (topid)
-
        end
 
-       subroutine readCL(cArg,f,n)
+       subroutine readCL(f,n)
        character *10 cArg
        integer f,n
-       DO i = 1, iargc()
-              CALL getarg(i, cArg)
+       do i = 1, iargc()
+              call getarg(i, cArg)
               if(i.eq.1)then                     
-                     READ(cArg,*) f
+                     read(cArg,*) f
                      if(f.gt.2.or.f.lt.1)then
                             print*,"error-input of function:",f
                             f=1
                      endif        
               elseif(i.eq.2)then
-                     READ(cArg,*) n
-                     if(n.gt.17.or.n.lt.1)then
+                     read(cArg,*) n
+                     if(n.gt.20.or.n.lt.1)then
                             print*,"error-input of n:",n
-                            n=17
+                            n=20
                      endif
               endif
-       END DO
+       end do
        end
 
-       subroutine integrate(f,n,id,integral)
-           integer f,n,id
-           double precision integral
+       subroutine startIntegration(f,n,integral)
+           integer f,n
+           double precision integral,a,b1,b2
+           parameter(a = 0, b1 = 3.14159265358979323, b2 = 1.0)
            if(f.eq.1)then
-              call integrateF1(n,id,integral)
-           elseif(f.eq.2)then
-              call integrateF2(n,id,integral)              
+              call integrate(n,integral,f,a,b1)
+           else
+              call integrate(n,integral,f,a,b2)    
            endif
        end
 
-       subroutine integrateF1(n,id,summe)
-              integer start,stop,timenowhigh,timediff,n,id,exponent,nL
-              double precision a,b,h,summe,step,f1,micro,aL,bL
-              parameter(micro=10**6,a = 0, b = 3.14159265358979323)
 
+       subroutine integrate(n,summe,f,a,b)
+              integer start,stop,timenowhigh,timediff,n,id,exponent,nL,f
+              double precision a,b,h,summe,step,micro,aL,getVal
+              parameter(micro=10**6)
+
+              id=myprocid()
               start = timenowhigh()
 
               h= dble((b-a)/n)
               nL = n / nprocs()
               aL = a + id * nL * h
-              bL = aL + nL * h
 
-c             TODO hier vermutlich noch nicht komplett korrekt wegen Rand..
+c             Randwert a 
               if(id.eq.0)then
-                     summe = f1(a) + f1(b)
-                     step = aL + h
-                     nL = nl-1
-              else
-                     step = aL
-              endif
+                     summe = getVal(f,a)
+                     aL = aL + h
+c             Randwert b, letzte id
+              elseif(id.eq.(nprocs()-1))then
+                     summe = getVal(f,b)
+                     nL = nL-1
+              endif                
+              step = aL
 
+c             Zwischenstücke
               do i=1,(nL-1)
                      exponent = mod(i,2) + 1 
-                     summe = summe + f1(step) * 2**exponent
+                     summe = summe + getVal(f,step)* 2**exponent
                      step = step + h    
               enddo
 
@@ -109,43 +119,22 @@ c             TODO hier vermutlich noch nicht komplett korrekt wegen Rand..
               stop = timenowhigh()
               print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
        end
-       
+  
+       double precision function getVal(f,x)
+              integer f
+              double precision x,f1,f2
+              if(f.eq.1)then
+                     getVal = f1(x)
+              else
+                     getVal = f2(x)         
+              endif
+              return
+       end
+     
        double precision function f1(x)
               double precision x
               f1 = x*dsin(x)
               return
-       end
-
-       subroutine integrateF2(n,id,summe)
-              integer start,stop,timenowhigh,timediff,n,id,exponent,nL
-              double precision a,b,h,summe,step,f2,micro,aL,bL
-              parameter(micro=10**6,a = 0, b = 1)
-
-              start = timenowhigh()
-
-              h= dble((b-a)/n)
-              nL = n / nprocs()
-              aL = a + id * nL * h
-              bL = aL + nL * h
-
-c             TODO hier vermutlich noch nicht komplett korrekt wegen Rand..
-              if(id.eq.0)then
-                     summe = f2(a) + f2(b)
-                     step = aL + h
-                     nL = nl-1
-              else
-                     step = aL
-              endif
-
-              do i=1,(nL-1)
-                     exponent = mod(i,2) + 1 
-                     summe = summe + f2(step) * 2**exponent
-                     step = step + h    
-              enddo
-
-              summe=(h/3)*summe  
-              stop = timenowhigh()
-              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
        end
 
        double precision function f2(x)
