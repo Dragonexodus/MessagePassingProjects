@@ -30,17 +30,13 @@ c integrate
               call integrateF1(n,id,integral)
               summe = integral
          do i=1,(np-1)
-              call recv(topid,links(i),integral,1)
-c             gesendet und empfangen stimmt nicht überein?????
-c             Tests mit integer funktionierten aber!
-              print*,"recv", integral
+              call recv(topid,links(i),integral,8)
               summe = summe + integral
          enddo
                print*,"Pi Integral:",summe
        else
               call integrateF1(n,id,integral)
-              print*,"send", integral
-              call send(topid, link,integral,1)
+              call send(topid, link,integral,8)
        endif
 
 c choose f
@@ -92,7 +88,7 @@ c       endif
               aL = a + id * nL * h
               bL = aL + nL * h
 
-c             TODO hier vermutlich noch nicht komplett korrekt
+c             TODO hier vermutlich noch nicht komplett korrekt wegen Rand..
               if(id.eq.0)then
                      summe = f1(a) + f1(b)
                      step = aL + h
@@ -109,7 +105,7 @@ c             TODO hier vermutlich noch nicht komplett korrekt
 
               summe=(h/3)*summe  
               stop = timenowhigh()
-c              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
+              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
        end
        
        double precision function f1(x)
