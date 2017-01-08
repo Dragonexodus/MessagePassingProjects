@@ -1,55 +1,62 @@
        program integration
        character *10 cArg 
-       integer newtop,addnewlink,send,recv, id, links(7),link,size
-       integer topid, np, nprocs,res,tmp,f,n,size
+       integer newtop,addnewlink,links(7),link
+       integer topid, np, nprocs,f,n,id
+       double precision summe, integral
+
+       summe = 0
+       integral = 0
+       f = 1
+       n = 15
 
        id=myprocid()
        np = nprocs()
        topid=newtop(np-1)
-       tmp= 0
-  
-       f=1
-       n=15
+
        call readCL(cArg,f,n)
        n = 2**n
 
 c init star
        if(id.eq.0) then
-         do i=1,np-1
+         do i=1,(np-1)
               links(i)=addnewlink(topid,i,1)
          enddo
        else
          link=addnewlink(topid,0,1)
        endif
-c choose f
-       if(id.eq.0)then
-              print*,"use f",f," with n:",n
-          if(f.eq.1) then
-              call integrateF1(n,id,topid,link,links)
-          elseif(f.eq.2) then    
-              call integrateF2(n,id,topid,link,links)   
-          else 
-              call integrateF1(n,id,topid,link,links)
-              call integrateF2(n,id,topid,link,links)
-          endif
+
+c integrate
+       if(id.eq.0) then
+              call integrateF1(n,id,integral)
+              summe = integral
+         do i=1,(np-1)
+              call recv(topid,links(i),integral,1)
+c             gesendet und empfangen stimmt nicht überein?????
+c             Tests mit integer funktionierten aber!
+              print*,"recv", integral
+              summe = summe + integral
+         enddo
+               print*,"Pi Integral:",summe
+       else
+              call integrateF1(n,id,integral)
+              print*,"send", integral
+              call send(topid, link,integral,1)
        endif
-       call freetop (topid)
-c star communication:
-c       if(id.eq.0) then
-c         do i=1,np-1
-c         call send(topid,links(i),99,4)
-c         call recv(topid,links(i),res,4)
 
-c         tmp = tmp+res
-
-c         print *, "master get: ", res
-c       enddo
-c       print *, "master calculate: ",tmp
-c       else
-c         call recv(topid,link,res,4)
-c         print *, "slave ",id," send back: ",res+id
-c         call send(topid,link,res+id,4)
+c choose f
+c       if(id.eq.0)then
+c              print*,"use f",f," with n:",n
+c          if(f.eq.1) then
+c              call integrateF1(n,id,topid,link,links)
+c          elseif(f.eq.2) then    
+c              call integrateF2(n,id,topid,link,links)   
+c          else 
+c              call integrateF1(n,id,topid,link,links)
+c              call integrateF2(n,id,topid,link,links)
+c          endif
 c       endif
+       call freetop (topid)
+
        end
 
        subroutine readCL(cArg,f,n)
@@ -60,48 +67,49 @@ c       endif
               if(i.eq.1)then                     
                      READ(cArg,*) f
                      if(f.gt.3.or.f.lt.1)then
-                     print*,"error-input of function:",f
+                            print*,"error-input of function:",f
                             f=1
                      endif        
               elseif(i.eq.2)then
                      READ(cArg,*) n
                      if(n.gt.17.or.n.lt.1)then
-                     print*,"error-input of n:",n
+                            print*,"error-input of n:",n
                             n=17
                      endif
               endif
        END DO
        end
 
-       subroutine integrateF1(n,id,topid,link,links)
-              integer start,stop,timenowhigh,timediff,n,id,exponent
-              integer topid,link,links(7)
-              double precision a,b,h,summe,step,f1,micro,res
+       subroutine integrateF1(n,id,summe)
+              integer start,stop,timenowhigh,timediff,n,id,exponent,nL
+              double precision a,b,h,summe,step,f1,micro,aL,bL
               parameter(micro=10**6,a = 0, b = 3.14159265358979323)
 
               start = timenowhigh()
+
               h= dble((b-a)/n)
+              nL = n / nprocs()
+              aL = a + id * nL * h
+              bL = aL + nL * h
 
-c      local_n = n / p
-c      local_a = a + rank * local_n * h;
-c      local_b = local_a + local_n * h;
-
-              summe = f1(a)
-              step = a + h
-              if(n.gt.2) then
-                     do i=1,(n-2)
-                            exponent = mod(i,2) + 1 
-                            summe = summe + f1(step) * 2**exponent
-                            step = step + h    
-                     enddo
+c             TODO hier vermutlich noch nicht komplett korrekt
+              if(id.eq.0)then
+                     summe = f1(a) + f1(b)
+                     step = aL + h
+                     nL = nl-1
+              else
+                     step = aL
               endif
-              summe = summe + f1(b)
 
-              res=(h/3)*summe
+              do i=1,(nL-1)
+                     exponent = mod(i,2) + 1 
+                     summe = summe + f1(step) * 2**exponent
+                     step = step + h    
+              enddo
 
-              print*,"ID:",id," Pi f1:" ,res
+              summe=(h/3)*summe  
               stop = timenowhigh()
-              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
+c              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
        end
        
        double precision function f1(x)
@@ -110,37 +118,37 @@ c      local_b = local_a + local_n * h;
               return
        end
 
-       subroutine integrateF2(n,id,topid,link,links)    
-              integer start,stop,timenowhigh,timediff,n,id,exponent
-              integer topid,link,links(7)
-              double precision res,micro,a,b,h,summe,step,f2
-              parameter(micro=10**6, a = 0, b = 1)
+c       subroutine integrateF2(n,id,topid,link,links)    
+c              integer start,stop,timenowhigh,timediff,n,id,exponent
+c              integer topid,link,links(7)
+c              double precision res,micro,a,b,h,summe,step,f2
+c              parameter(micro=10**6, a = 0, b = 1)
 
-              start = timenowhigh()
-              h= dble((b-a)/n)
+c              start = timenowhigh()
+c              h= dble((b-a)/n)
 
-              summe = f2(a)
-              step = a + h
-              if(n.gt.2) then
-                     do i=1,(n-2)
-                            exponent = mod(i,2) + 1 
-                            summe = summe + f2(step) * 2**exponent
-                            step = step + h   
-                     enddo
-              endif
-              summe = summe + f2(b)
+c              summe = f2(a)
+c              step = a + h
+c              if(n.gt.2) then
+c                     do i=1,(n-2)
+c                            exponent = mod(i,2) + 1 
+c                            summe = summe + f2(step) * 2**exponent
+c                            step = step + h   
+c                     enddo
+c              endif
+c              summe = summe + f2(b)
               
-              res = (h/3)*summe
+c              res = (h/3)*summe
 
-              print*,"ID:",id," Pi f2:" ,res
+c              print*,"ID:",id," Pi f2:" ,res
 
-              stop = timenowhigh()
-              print*,"ID:",id," T:", dble(timediff(stop,start)/micro) 
-        end    
+c              stop = timenowhigh()
+c              print*,"ID:",id," T:", dble(timediff(stop,start)/micro) 
+c        end    
 
-       double precision function f2(x)
-              double precision x
-              f2 = dble(4/(1+x**2))
-              return 
-       end
+c       double precision function f2(x)
+c              double precision x
+c              f2 = dble(4/(1+x**2))
+c              return 
+c       end
 
