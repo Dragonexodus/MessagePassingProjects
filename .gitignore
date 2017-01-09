@@ -29,3 +29,13 @@
 *.app
 /.idea/
 *fortMPP.sh
+/rectangle/Debug/
+Würde CMakeLists.txt löschen
+Würde cmake-build-debug/ löschen
+Würde integration/A2star.f löschen
+Würde rectangle/CMakeLists.txt löschen
+Würde rectangle/Debug/ löschen
+Würde rectangle/main.cpp löschen
+/cmake-build-debug/
+/integration/A2star.f
+!/integration/A2star.f
