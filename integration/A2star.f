@@ -12,9 +12,7 @@
        np = nprocs()
 
 c      check processor count
-       if(mod(np,2).eq.0)then
-     
-              topid=newtop(np-1)
+       topid=newtop(np-1)
 
               call readCL(f,n)
               n = 2**n
@@ -45,11 +43,7 @@ c slave part of the integral + send
               endif
             
               call freetop (topid)
-       else 
-              if(id.eq.0) then
-                     print*,"ERROR: incorrect number of processors!"
-              endif
-       endif
+       
        end
 
        subroutine readCL(f,n)
@@ -101,8 +95,9 @@ c             Randwert a
               if(id.eq.0)then
                      summe = getVal(f,a)
                      aL = aL + h
+              endif
 c             Randwert b, letzte id
-              elseif(id.eq.(nprocs()-1))then
+              if(id.eq.(nprocs()-1))then
                      summe = getVal(f,b)
                      nL = nL-1
               endif                
@@ -110,7 +105,14 @@ c             Randwert b, letzte id
 
 c             Zwischenstücke
               do i=1,(nL-1)
-                     exponent = mod(i,2) + 1 
+c TODO herausfinden warum im sequenziellen Fall mit nL das Ergebnis viel genauer ist
+c TODO betrachte 1 Randstück zu viel bei mehreren Prozessoren fixen
+                     if(id.eq.0)then
+                            print*,"i:",i
+                            exponent = mod(i,2) + 1 
+                     else
+                            exponent = mod(i+1,2) + 1
+                     endif
                      summe = summe + getVal(f,step)* 2**exponent
                      step = step + h    
               enddo
