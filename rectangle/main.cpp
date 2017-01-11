@@ -2,9 +2,8 @@
 
 #include <fstream>
 #include <vector>
+#include <sstream>
 #include "MatrixBuilder.h"
-
-using namespace std;
 
 void readFile();
 
@@ -33,21 +32,35 @@ int main(int argc, char **argv) {
 }
 
 void readFile() {
-    string line;
-    ifstream myfile("config");
-    if (myfile.is_open()) {
-        int mode = atoi(getline(myfile, line));
-        vector<string> lines;
-        while (getline(myfile, line)) {
+    std::string line;
+
+    //TODO file öffnen, wenn man MPI nutzt!
+    // Ohne MPI "../config" um File zu finden!
+    std::ifstream configFile("../config");
+
+    if (configFile.is_open()) {
+        std::vector<std::string> lines;
+        std::getline(configFile,line);
+        std::istringstream stringStream(line);
+        int mode = 0;
+        stringStream >> mode;
+        //int parsing
+        std::cout << mode << std::endl;
+        while (getline(configFile, line)) {
             lines.push_back(line);
         }
-        myfile.close();
+        //Beispielausgabe
+        for(auto it = lines.begin(); it != lines.end(); ++it){
+            std::cout << *it << std::endl;
+        }
+        configFile.close();
         if (mode == 1 || mode == 2 || mode == 3) {
-            MatrixBuilder *builder = new MatrixBuilder(mode);
+            MatrixBuilder *matrixBuilder = new MatrixBuilder(mode);
             // TODO: how to realize the matrix?
             // bool matrix[][] = builder->constructMatrix(lines);
+             delete matrixBuilder; //später an anderer Stelle nicht vergessen..
         }
     } else {
-        cout << "Unable to open file";
+        std::cout << "Unable to open file" << std::endl;
     }
 }

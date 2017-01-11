@@ -8,30 +8,22 @@
 
 #include <fstream>
 #include <string>
-#include <bits>
 #include <vector>
 
-class constructMatrix;
 
 class MatrixBuilder {
 public:
-    MatrixBuilder(int mode) {
-        this->mode = mode;
-    }
+    MatrixBuilder(const int mode);
+    ~MatrixBuilder();
 
-    int getMode() const {
-        return mode;
-    }
+    const int getMode();
 
-    void setMode(int mode) {
-        MatrixBuilder::mode = mode;
-    }
+    void setMode(const int mode);
 
-    //bool constructMatrix(std::vector<std::string> lines)[][];
+    const bool constructMatrix(std::vector<std::string> lines);
 
 private:
     int mode;
-
 
 };
 
