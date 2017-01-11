@@ -1,7 +1,7 @@
        program integration
        integer newtop,addnewlink,links(7),link
        integer topid, np, nprocs,f,n,id
-       double precision summe, integral
+       double precision summe, integral, derivation,PI
 
        summe = 0
        integral = 0
@@ -11,39 +11,49 @@
        id=myprocid()
        np = nprocs()
 
-c      check processor count
+c      Beschränkung auf eine gerade Prozessoranzahl!
+c      (nL sollte ganzzahlig sein)
+       if(mod(i,2).eq.0)then
+c
        topid=newtop(np-1)
 
               call readCL(f,n)
               n = 2**n
-c init star
+
+c      initalisierie Stern-Topologie
               if(id.eq.0) then
-                do i=1,(np-1)
-                     links(i)=addnewlink(topid,i,1)
-                enddo
+                     do i=1,(np-1)
+                            links(i)=addnewlink(topid,i,1)
+                     enddo
               else
-                link=addnewlink(topid,0,1)
+                     link=addnewlink(topid,0,1)
               endif
-c integrate
+
+c      starte die Integration
+              call startIntegration(f,n,integral)
               if(id.eq.0) then
-                 print*,"use f",f," with n:",n
-                 call startIntegration(f,n,integral)
-c master part of the integral
-                 summe = integral
-                 do i=1,(np-1)
-c receive and add all slave parts of the integral
-                        call recv(topid,links(i),integral,8)
-                        summe = summe + integral
-                 enddo
-                 print*,"Pi Integral:",summe
+                     print*,"use f:",f," with n:",n
+c      Integralteilstück vom Master
+                     summe = integral
+                     do i=1,(np-1)
+c      Empfange alle Teilstücke und addiere Sie
+                            call recv(topid,links(i),integral,8)
+                            summe = summe + integral
+                     enddo
+                     derivation =  PI() - summe
+                     print*,"--------------------------"
+                     print*,"PI Referece:",PI()                   
+                     print*,"PI Integral:",summe
+                     print*,"PI Derivat.:",derivation
               else
-c slave part of the integral + send
-                  call startIntegration(f,n,integral)
-                  call send(topid, link,integral,8)
+c      Sende Integralteilstücke zum Master
+                     call send(topid, link,integral,8)
               endif
-            
+c      Löse erstellte Topologie wieder auf            
               call freetop (topid)
-       
+       else
+              print*,"error-input of procs:",np ," (mod(p,2) == 0)"
+       endif
        end
 
        subroutine readCL(f,n)
@@ -68,93 +78,99 @@ c slave part of the integral + send
        end
 
        subroutine startIntegration(f,n,integral)
-           integer f,n
-           double precision integral,a,b1,b2
-           parameter(a = 0, b1 = 3.14159265358979323, b2 = 1.0)
-           if(f.eq.1)then
+       integer f,n
+       double precision integral,a,b1,b2,PI
+       parameter(a = 0, b2 = 1.0)
+     
+       if(f.eq.1)then
+              b1 = PI()
               call integrate(n,integral,f,a,b1)
-           else
+       else
               call integrate(n,integral,f,a,b2)    
-           endif
+       endif
        end
 
-
        subroutine integrate(n,summe,f,a,b)
-              integer start,stop,timenowhigh,timediff,n,id,exponent,nL,f
-              integer subPart
-              double precision a,b,h,summe,step,micro,aL,getVal
-              parameter(micro=10**6)
+       integer start,stop,timenowhigh,timediff,n,id,exponent,nL,f
+       integer factor,i,offset
+       double precision a,b,h,summe,step,micro,aL,getVal
+       parameter(micro=10**6)
 
-              id=myprocid()
-              start = timenowhigh()
+       id = myprocid()
+       start = timenowhigh()
 
-              h= dble((b-a)/n)
-              nL = n / nprocs()
-              aL = a + id * nL * h
+       h = dble((b-a)/n)
+       nL = n / nprocs()
+       aL = a + id * nL * h
 
-              if(id.eq.0.or.id.eq.(nprocs()-1))then
-                     nL=nL-1              
-              endif
+c      Relevant für exponent!
+       offset = 1
 
-c             Randwert a 
-              if(id.eq.0)then
-                     summe = getVal(f,a)
-                     aL = aL + h
-              endif
-c             Randwert b, letzte id
-              if(id.eq.(nprocs()-1))then
-                     summe = getVal(f,b)
-              endif   
-                   
-              step = aL
+c      Randwert a, erste id
+c      Erstes aL, berechnet gehe zum nächsten über 
+c      und mache einen Schritt weniger 
+       if(id.eq.0)then
+              summe = getVal(f,a)
+              aL = aL + h
+              nL = nL-1  
+       endif
 
-c             Zwischenstücke
-              do i=1,(nL)
-c TODO herausfinden warum im sequenziellen Fall mit nL das Ergebnis viel genauer ist
-c TODO betrachte 1 Randstück zu viel bei mehreren Prozessoren fixen
-                     
-                     if(id.eq.0)then
-                            exponent = mod(i,2) + 1
-                            subPart=2**exponent
-                            print*,"0: i: ",i," exp: ",subPart
-                     elseif(id.eq.(nprocs()-1))then
-                            exponent = mod(i+1,2) + 1
-                            subPart=2**exponent
-                            print*,"n: i: ",i," exp: ",subPart
-                     else
-                            exponent = mod(i+1,2) + 1    
-                            subPart=2**exponent                        
-                            print*,"0<m<n: m: i: ",i," exp: ",subPart
-                     endif
-                     summe = summe + getVal(f,step)* subPart
-                     step = step + h    
-              enddo
+c      Randwert b, letzte id
+c      Letztes aL, berechnet und mache einen Schritt weniger
+       if(id.eq.(nprocs()-1))then
+              summe = getVal(f,b)   
+              nL = nL-1  
+       endif
+   
+c      End/zwischenstück(e) starten mit Faktor 2, nicht Faktor 4
+c      Verschiebe um eins, Schrittanzahl bleibt gleich  
+       if(id.gt.0)then            
+              offset = offset +1
+              nL = nL + 1
+       endif
 
-              summe=(h/3)*summe  
-              stop = timenowhigh()
-              print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
+       step = aL
+
+c      Berechnung zwischenstücke
+       do i=offset,(nL)
+              exponent = mod(i,2) + 1
+              factor=2**exponent
+              summe = summe + dble(getVal(f,step) * factor)
+              step = step + h    
+       enddo
+       
+       summe = dble(h/3)*summe  
+       stop = timenowhigh()
+       print*,"ID:",id," T:", dble(timediff(stop,start)/micro)
        end
   
        double precision function getVal(f,x)
-              integer f
-              double precision x,f1,f2
-              if(f.eq.1)then
-                     getVal = f1(x)
-              else
-                     getVal = f2(x)         
-              endif
-              return
+       integer f
+       double precision x,f1,f2
+       if(f.eq.1)then
+              getVal = f1(x)
+       else
+              getVal = f2(x)         
+       endif
+       return
        end
      
        double precision function f1(x)
-              double precision x
-              f1 = x*dsin(x)
-              return
+       double precision x
+       f1 = x*dsin(x)
+       return
        end
 
        double precision function f2(x)
-              double precision x
-              f2 = dble(4/(1+x**2))
-              return 
+       double precision x
+       f2 = dble(4/(1+x**2))
+       return 
+       end
+
+c      Fortran 77 empfohlen um Pi zu erzeugen
+c      https://stackoverflow.com/questions/2157920/why-define-pi-4atan1#2157952
+       double precision function PI()
+       PI = 4.D0*DATAN(1.D0)
+       return 
        end
 
