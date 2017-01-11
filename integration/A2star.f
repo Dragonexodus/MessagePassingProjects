@@ -104,7 +104,7 @@ c      Löse erstellte Topologie wieder auf
        aL = a + id * nL * h
 
 c      Relevant für exponent!
-       offset = 1
+       offset = 0
 
 c      Randwert a, erste id
 c      Erstes aL, berechnet gehe zum nächsten über 
@@ -125,15 +125,14 @@ c      Letztes aL, berechnet und mache einen Schritt weniger
 c      End/zwischenstück(e) starten mit Faktor 2, nicht Faktor 4
 c      Verschiebe um eins, Schrittanzahl bleibt gleich  
        if(id.gt.0)then            
-              offset = offset +1
-              nL = nL + 1
+              offset = 1
        endif
 
        step = aL
 
 c      Berechnung zwischenstücke
-       do i=offset,(nL)
-              exponent = mod(i,2) + 1
+       do i=1,nL
+              exponent = mod(i+offset,2) + 1
               factor=2**exponent
               summe = summe + dble(getVal(f,step) * factor)
               step = step + h    
