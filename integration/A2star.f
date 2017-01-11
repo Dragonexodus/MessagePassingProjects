@@ -81,6 +81,7 @@ c slave part of the integral + send
 
        subroutine integrate(n,summe,f,a,b)
               integer start,stop,timenowhigh,timediff,n,id,exponent,nL,f
+              integer subPart
               double precision a,b,h,summe,step,micro,aL,getVal
               parameter(micro=10**6)
 
@@ -91,6 +92,10 @@ c slave part of the integral + send
               nL = n / nprocs()
               aL = a + id * nL * h
 
+              if(id.eq.0.or.id.eq.(nprocs()-1))then
+                     nL=nL-1              
+              endif
+
 c             Randwert a 
               if(id.eq.0)then
                      summe = getVal(f,a)
@@ -99,21 +104,29 @@ c             Randwert a
 c             Randwert b, letzte id
               if(id.eq.(nprocs()-1))then
                      summe = getVal(f,b)
-                     nL = nL-1
-              endif                
+              endif   
+                   
               step = aL
 
 c             Zwischenstücke
-              do i=1,(nL-1)
+              do i=1,(nL)
 c TODO herausfinden warum im sequenziellen Fall mit nL das Ergebnis viel genauer ist
 c TODO betrachte 1 Randstück zu viel bei mehreren Prozessoren fixen
+                     
                      if(id.eq.0)then
-                            print*,"i:",i
-                            exponent = mod(i,2) + 1 
-                     else
+                            exponent = mod(i,2) + 1
+                            subPart=2**exponent
+                            print*,"0: i: ",i," exp: ",subPart
+                     elseif(id.eq.(nprocs()-1))then
                             exponent = mod(i+1,2) + 1
+                            subPart=2**exponent
+                            print*,"n: i: ",i," exp: ",subPart
+                     else
+                            exponent = mod(i+1,2) + 1    
+                            subPart=2**exponent                        
+                            print*,"0<m<n: m: i: ",i," exp: ",subPart
                      endif
-                     summe = summe + getVal(f,step)* 2**exponent
+                     summe = summe + getVal(f,step)* subPart
                      step = step + h    
               enddo
 
