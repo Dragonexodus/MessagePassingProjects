@@ -24,9 +24,13 @@ public:
 private:
     int mode;
 
-    vector<pair<int, int>> splitAndParse(const string &s, char delim);
+    vector<pair<int, int>> splitAndParseToCoords(const string &s, char delim);
 
-    bool validateCoords(vector<pair<int, int>> coords);
+    bool validateRectCoords(vector<pair<int, int>> coords, int i);
+
+    vector<vector<short>> fill(int n, short background);
+
+    bool validateCoords(vector<pair<int, int>> coords, int n);
 };
 
 

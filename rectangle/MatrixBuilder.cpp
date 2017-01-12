@@ -16,32 +16,43 @@ const int MatrixBuilder::getMode() {
 
 const vector<vector<short>> MatrixBuilder::constructMatrix(vector<string> lines) {
     vector<vector<short>> matrix;
-    if (mode == 1) {
+    if (mode == 1 || mode == 2) {
         int n = atoi(lines[0].c_str());
-        short backgroundColor = atoi(lines[1].c_str());
-        vector<pair<int, int>> coords = splitAndParse(lines[2], ' ');
-
-        bool valid = validateCoords(coords);
-        if (valid && n > 0) {
-            for (int y = 0; y < n; ++y) {
-                vector<short> tmp;
-                for (int x = 0; x < n; ++x) {
-                    //TODO: check coords to draw inner rectangle
-                    tmp.push_back(backgroundColor);
+        short background = atoi(lines[1].c_str()) % 2;
+        short foreground = (background + 1) % 2;
+        vector<pair<int, int>> coords = splitAndParseToCoords(lines[2], ' ');
+        if (mode == 1) {
+            bool valid = validateRectCoords(coords, n);
+            if (valid) {
+                matrix = fill(n, background);
+                for (int x = coords[0].first; x < coords[1].first; ++x) {
+                    for (int y = coords[0].second; y < coords[2].second; ++y) {
+                        matrix[x][y] = foreground;
+                    }
                 }
-                matrix.push_back(tmp);
+            } else {
+                std::cout << "error: validation of rectangle failure." << std::endl;
             }
         } else {
-            std::cout << "error: validation of rectangle failure." << std::endl;
-            //TODO: error or exception
+            bool valid = validateCoords(coords, n);
+            if (valid) {
+                matrix = fill(n, background);
+                for (int i = 0; i < coords.size(); ++i) {
+                    matrix[coords[i].first][coords[i].second] = foreground;
+                }
+            } else {
+                std::cout << "error: validation of rectangle failure." << std::endl;
+            }
         }
+    } else if (mode == 3) {
+        //TODO: read and parse simple matrix
     }
 
     return matrix;
 }
 
 
-vector<pair<int, int>> MatrixBuilder::splitAndParse(const string &s, char delim) {
+vector<pair<int, int>> MatrixBuilder::splitAndParseToCoords(const string &s, char delim) {
     vector<pair<int, int>> elems;
     stringstream ss;
     ss.str(s);
@@ -59,31 +70,43 @@ vector<pair<int, int>> MatrixBuilder::splitAndParse(const string &s, char delim)
     return elems;
 }
 
-bool MatrixBuilder::validateCoords(vector<pair<int, int>> coords) {
+bool MatrixBuilder::validateRectCoords(vector<pair<int, int>> coords, int n) {
     bool valid = false;
-    if (coords.size() == 4) {
+    if (coords.size() == 3) {
         int a1 = coords[1].first - coords[0].first;
         int b1 = coords[2].second - coords[0].second;
-        int a2 = coords[3].first - coords[2].first;
-        int b2 = coords[3].second - coords[1].second;
 
         bool edgeA1Straight = coords[1].second == coords[0].second;
         bool edgeB1Straight = coords[2].first == coords[0].first;
-        bool edgeA2Straight = coords[3].second == coords[2].second;
-        bool edgeB2Straight = coords[3].first == coords[1].first;
-        valid = a1 == a2 && b1 == b2 && a1 > 0 && b1 > 0;
-        valid = valid && edgeA1Straight && edgeB1Straight && edgeA2Straight && edgeB2Straight;
+        bool lowerThanN = coords[0].first < n && coords[1].first < n && coords[2].first < n &&
+                          coords[0].second < n && coords[1].second < n && coords[2].second < n;
+        bool notNegative = coords[0].first >= 0 && coords[1].first >= 0 && coords[2].first >= 0 &&
+                           coords[0].second >= 0 && coords[1].second >= 0 && coords[2].second >= 0 && n > 0;
+        valid = a1 > 0 && b1 > 0 && edgeA1Straight && edgeB1Straight && notNegative && lowerThanN;
     }
     return valid;
 }
 
-//??
-/*
- * const bool MatrixBuilder::constructMatrix(vector<string> lines){
-    //TODO read lines
-    bool matrix[4][4] = {{0,0,0,0},
-                         {0,0,0,0},
-                         {0,0,0,0},
-                         {0,0,0,0}};
+bool MatrixBuilder::validateCoords(vector<pair<int, int>> coords, int n) {
+    bool valid = false;
+    if (coords.size() > 0) {
+        valid = true;
+        for (int i = 0; i < coords.size(); ++i) {
+            valid = valid && coords[i].first < n && coords[i].first >= 0 && coords[i].second < n &&
+                    coords[i].second >= 0;
+        }
+    }
+    return valid;
+}
+
+vector<vector<short>> MatrixBuilder::fill(int n, short background) {
+    vector<vector<short>> matrix;
+    for (int y = 0; y < n; ++y) {
+        vector<short> tmp;
+        for (int x = 0; x < n; ++x) {
+            tmp.push_back(background);
+        }
+        matrix.push_back(tmp);
+    }
     return matrix;
-}*/
+}
