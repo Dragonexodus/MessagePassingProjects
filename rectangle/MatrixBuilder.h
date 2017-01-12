@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-
+using namespace std;
 class MatrixBuilder {
 public:
     MatrixBuilder(const int mode);
@@ -18,13 +18,15 @@ public:
 
     const int getMode();
 
-    void setMode(const int mode);
+    const vector<vector<short>> constructMatrix(vector<string> lines);
 
-    const bool constructMatrix(std::vector<std::string> lines);
 
 private:
     int mode;
 
+    vector<pair<int, int>> splitAndParse(const string &s, char delim);
+
+    bool validateCoords(vector<pair<int, int>> coords);
 };
 
 

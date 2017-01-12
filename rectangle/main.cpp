@@ -5,6 +5,8 @@
 #include <sstream>
 #include "MatrixBuilder.h"
 
+using namespace std;
+
 void readFile();
 
 int main(int argc, char **argv) {
@@ -17,9 +19,9 @@ int main(int argc, char **argv) {
         //Testausgabe
         /*for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                std::cout << rectangleTrue[i * 4 + j];
+                cout << rectangleTrue[i * 4 + j];
             }
-            std::cout << std::endl;
+            cout << endl;
         }*/
     }
 
@@ -32,35 +34,42 @@ int main(int argc, char **argv) {
 }
 
 void readFile() {
-    std::string line;
+    string line;
 
     //TODO file öffnen, wenn man MPI nutzt!
     // Ohne MPI "../config" um File zu finden!
-    std::ifstream configFile("../config");
+    ifstream configFile("config");
 
     if (configFile.is_open()) {
-        std::vector<std::string> lines;
-        std::getline(configFile,line);
-        std::istringstream stringStream(line);
+        vector<string> lines;
+        getline(configFile, line);
+        istringstream stringStream(line);
         int mode = 0;
         stringStream >> mode;
         //int parsing
-        std::cout << mode << std::endl;
+        cout << mode << endl;
         while (getline(configFile, line)) {
             lines.push_back(line);
         }
         //Beispielausgabe
         for(auto it = lines.begin(); it != lines.end(); ++it){
-            std::cout << *it << std::endl;
+            cout << *it << endl;
         }
         configFile.close();
         if (mode == 1 || mode == 2 || mode == 3) {
             MatrixBuilder *matrixBuilder = new MatrixBuilder(mode);
+            const vector<vector<short>> &matrix = matrixBuilder->constructMatrix(lines);
+            for (auto it = matrix.begin(); it != matrix.end(); ++it) {
+                for (auto elem = it->begin(); elem != it->end(); ++elem) {
+                    cout << *elem << " ";
+                }
+                cout << endl;
+            }
             // TODO: how to realize the matrix?
             // bool matrix[][] = builder->constructMatrix(lines);
              delete matrixBuilder; //später an anderer Stelle nicht vergessen..
         }
     } else {
-        std::cout << "Unable to open file" << std::endl;
+        cout << "Unable to open file" << endl;
     }
 }
