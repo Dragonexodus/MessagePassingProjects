@@ -21,6 +21,8 @@ public:
     const vector<vector<short>> constructMatrix(vector<string> lines);
 
 
+    void printMatrix(vector<vector<short>> matrix);
+
 private:
     int mode;
 
@@ -31,6 +33,7 @@ private:
     vector<vector<short>> fill(int n, short background);
 
     bool validateCoords(vector<pair<int, int>> coords, int n);
+
 };
 
 

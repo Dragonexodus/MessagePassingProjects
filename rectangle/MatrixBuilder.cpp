@@ -110,3 +110,12 @@ vector<vector<short>> MatrixBuilder::fill(int n, short background) {
     }
     return matrix;
 }
+
+void MatrixBuilder::printMatrix(vector<vector<short>> matrix) {
+    for (auto it = matrix.begin(); it != matrix.end(); ++it) {
+        for (auto elem = it->begin(); elem != it->end(); ++elem) {
+            cout << *elem << " ";
+        }
+        cout << endl;
+    }
+}
