@@ -50,6 +50,8 @@ void readFile() {
         for (auto it = lines.begin(); it != lines.end(); ++it) {
             cout << *it << endl;
         }
+        cout << endl;
+
         configFile.close();
         //create and print the matrix
         if (mode == 1 || mode == 2 || mode == 3) {

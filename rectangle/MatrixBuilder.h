@@ -34,6 +34,7 @@ private:
 
     bool validateCoords(vector<pair<int, int>> coords, int n);
 
+    vector<short> splitAndParseToLine(const string &s, char delim);
 };
 
 

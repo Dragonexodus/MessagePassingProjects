@@ -45,7 +45,9 @@ const vector<vector<short>> MatrixBuilder::constructMatrix(vector<string> lines)
             }
         }
     } else if (mode == 3) {
-        //TODO: read and parse simple matrix
+        for (auto it = lines.begin(); it != lines.end(); ++it) {
+            matrix.push_back(splitAndParseToLine(*it, ' '));
+        }
     }
 
     return matrix;
@@ -66,6 +68,19 @@ vector<pair<int, int>> MatrixBuilder::splitAndParseToCoords(const string &s, cha
         }
         tmp = atoi(item.c_str());
         i++;
+    }
+    return elems;
+}
+
+vector<short> MatrixBuilder::splitAndParseToLine(const string &s, char delim) {
+    vector<short> elems;
+    stringstream ss;
+    ss.str(s);
+    string item;
+    short parsedElem;
+    while (getline(ss, item, delim)) {
+        parsedElem = atoi(item.c_str()) % 2;
+        elems.push_back(parsedElem);
     }
     return elems;
 }
