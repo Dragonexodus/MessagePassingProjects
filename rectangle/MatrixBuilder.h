@@ -6,7 +6,6 @@
 #define PROJECT_MATRIXBUILDER_H
 
 
-#include <fstream>
 #include <string>
 #include <vector>
 
@@ -20,21 +19,10 @@ public:
 
     const vector<vector<short>> constructMatrix(vector<string> lines);
 
-
-    void printMatrix(vector<vector<short>> matrix);
-
 private:
     int mode;
 
-    vector<pair<int, int>> splitAndParseToCoords(const string &s, char delim);
-
-    bool validateRectCoords(vector<pair<int, int>> coords, int i);
-
     vector<vector<short>> fill(int n, short background);
-
-    bool validateCoords(vector<pair<int, int>> coords, int n);
-
-    vector<short> splitAndParseToLine(const string &s, char delim);
 };
 
 

@@ -9,6 +9,8 @@ using namespace std;
 
 void readFile();
 
+void printMatrix(vector<vector<short>> matrix);
+
 int main(int argc, char **argv) {
     const int MASTER = 0;
     int p;
@@ -57,10 +59,19 @@ void readFile() {
         if (mode == 1 || mode == 2 || mode == 3) {
             MatrixBuilder *matrixBuilder = new MatrixBuilder(mode);
             const vector<vector<short>> &matrix = matrixBuilder->constructMatrix(lines);
-            matrixBuilder->printMatrix(matrix);
+            printMatrix(matrix);
             delete matrixBuilder;
         }
     } else {
         cout << "Unable to open file" << endl;
+    }
+}
+
+void printMatrix(vector<vector<short>> matrix) {
+    for (auto it = matrix.begin(); it != matrix.end(); ++it) {
+        for (auto elem = it->begin(); elem != it->end(); ++elem) {
+            cout << *elem << " ";
+        }
+        cout << endl;
     }
 }
