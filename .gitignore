@@ -37,5 +37,4 @@ Würde rectangle/CMakeLists.txt löschen
 Würde rectangle/Debug/ löschen
 Würde rectangle/main.cpp löschen
 /cmake-build-debug/
-/integration/A2star.f
-!/integration/A2star.f
+/copyFiles.sh

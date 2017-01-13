@@ -13,7 +13,7 @@
 
 c      Beschränkung auf eine gerade Prozessoranzahl!
 c      (nL sollte ganzzahlig sein)
-       if(mod(i,2).eq.0)then
+       if(np.eq.1.or.mod(np,2).eq.0)then
 c
        topid=newtop(np-1)
 
@@ -52,7 +52,9 @@ c      Sende Integralteilstücke zum Master
 c      Löse erstellte Topologie wieder auf            
               call freetop (topid)
        else
-              print*,"error-input of procs:",np ," (mod(p,2) == 0)"
+              if(id.eq.0) then
+              print*,"error-input of procs:",np ," (mod(p,2) != 0)"
+              endif
        endif
        end
 
@@ -173,3 +175,5 @@ c      https://stackoverflow.com/questions/2157920/why-define-pi-4atan1#2157952
        return 
        end
 
+c compile with: f77.px -o A2star.px A2star.f
+c run with: run -f0 4 2 A2star.px
