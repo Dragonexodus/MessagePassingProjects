@@ -1,5 +1,5 @@
 #include <mpi.h>
-
+#include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
         double startTimer = MPI_Wtime();
         readFile();
         double stopTimer = MPI_Wtime();
-        std::cout << "Benötigte Zeit: " << stopTimer - startTimer;
+        std::cout << "Benötigte Zeit: " << stopTimer - startTimer << std::endl;
     }
 
     MPI_Finalize();
