@@ -29,6 +29,8 @@
 *.app
 /.idea/
 *fortMPP.sh
+*copyFiles.sh
+
 /rectangle/Debug/
 Würde CMakeLists.txt löschen
 Würde cmake-build-debug/ löschen
