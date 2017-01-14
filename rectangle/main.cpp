@@ -1,18 +1,4 @@
-#include <mpi.h>
-#include <fstream>
-#include <vector>
-#include <sstream>
-#include "MatrixBuilder.h"
-
-using namespace std;
-
-const vector<vector<short>> readFile();
-
-void printMatrix(vector<vector<short>> matrix);
-
-int search(const vector<vector<short>> &matrix);
-
-bool indexRectHasValues(vector<vector<int>> indexRect);
+#include "main.h"
 
 int main(int argc, char **argv) {
     const int MASTER = 0;
@@ -25,13 +11,14 @@ int main(int argc, char **argv) {
 
     if (rank == MASTER) {
         double startTimer = MPI_Wtime();
-        const vector<vector<short>> &matrix = readFile();
+        const vector<vector<int>> &matrix = readFile();
+
         printMatrix(matrix);
 
         int searchResult = search(matrix);
-        if (searchResult == 0) {
+        if (searchResult == MISMATCH_FOUND) {
             cout << "Found some black fields, but no black rectangle!" << std::endl;
-        } else if (searchResult == 2) {
+        } else if (searchResult == NO_RECT) {
             cout << "No black fields found!" << std::endl;
         }
 
@@ -44,12 +31,15 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int search(const vector<vector<short>> &matrix) {
+//TODO search segmentation fault for mode 3
+//TODO Refactor, weniger returns, aufteilen in diverse methoden, evtl. sogar als objekt
+int search(const vector<vector<int>> &matrix) {
     vector<vector<int>> indexRect;
     vector<int> indexLine;
     bool closedRect = false;
     int yBeginOfRect = -1;
 
+    //begin of magic o.o??
     for (int y = 0; y < matrix.size(); ++y) {
         if (y > 0 && indexLine.size() > 0) {
             indexRect.push_back(indexLine);
@@ -58,20 +48,22 @@ int search(const vector<vector<short>> &matrix) {
         bool foundInLine = false;
         int indexUntilFound = 0;
         for (int x = 0; x < matrix.size(); ++x) {
-            short color = matrix[x][y];
-            if (color == 0 && closedRect) {
-                return 0;//black found but rectangle is closed;
+            int color = matrix[x][y];
+            if (!color && closedRect) {
+                return MISMATCH_FOUND;//black found but rectangle is closed;
             }
-            if (color == 0) {
+            if (!color) {
                 if (indexRectHasValues(indexRect)) {
                     vector<int> &lastLine = indexRect[indexRect.size() - 1];
-                    if (lastLine[lastLine.size() - 1] < x || lastLine[0] > x) {
-                        return 0;//black found, but not under upper black line
+                    if (lastLine[lastLine.size() - 1] < x || lastLine.front() > x) {
+                        return MISMATCH_FOUND;//black found, but not under upper black line
                     }
-                    if (!foundInLine && lastLine[0] != x) {
-                        return 0;//black found, but upper line begins somewhere else
+                    if (!foundInLine && lastLine.front() != x) {
+                        return MISMATCH_FOUND;//black found, but upper line begins somewhere else
                     }
-                } else { yBeginOfRect = y; }
+                } else {
+                    yBeginOfRect = y;
+                }
 
                 foundInLine = true;
                 indexLine.push_back(x);
@@ -80,7 +72,7 @@ int search(const vector<vector<short>> &matrix) {
                 if (indexRectHasValues(indexRect)) {
                     if (foundInLine) {
                         if (indexRect[indexRect.size() - 1][indexUntilFound] == x) {
-                            return 0;//white in line of black but with upper black line
+                            return MISMATCH_FOUND;//white in line of black but with upper black line
                         }
                     } else {
                         if (x == matrix.size() - 1) {
@@ -92,64 +84,61 @@ int search(const vector<vector<short>> &matrix) {
             }
         }
     }
+    //TODO erwartet: 6 6 15 6 6 15 ergebnis: 6:6 14:6 6:14 14:14 !
     if (indexRectHasValues(indexRect)) {
-        vector<int> &firstLine = indexRect[0];
-        vector<int> &lastLine = indexRect[indexRect.size() - 1];
-        cout << "rectangle found: " << firstLine[0] << ":" << yBeginOfRect << " "
+        vector<int> &firstLine = indexRect.front();
+        vector<int> &lastLine = indexRect.back();
+        cout << "rectangle found: " << firstLine.front() << ":" << yBeginOfRect << " "
              << firstLine[firstLine.size() - 1] << ":" << yBeginOfRect << " "
-             << lastLine[0] << ":" << firstLine[0] + indexRect.size() - 1 << " "
-             << lastLine[lastLine.size() - 1] << ":" << firstLine[0] + indexRect.size() - 1 << endl;
-        return 1;
+             << lastLine.front() << ":" << firstLine.front() + indexRect.size() - 1 << " "
+             << lastLine[lastLine.size() - 1] << ":" << firstLine.front() + indexRect.size() - 1 << endl;
+        return RECT_FOUND;
     }
-    return 2;//no rect found
+    return NO_RECT;//no rect found
 }
 
-
-const vector<vector<short>> readFile() {
-    string line;
+/**
+ *
+ * @return a matrix with found values, if nothing found an empty matrix is returned
+ */
+const vector<vector<int>> readFile() {
 
     ifstream configFile("config");
 
     if (configFile.is_open()) {
+        string line;
         vector<string> lines;
         getline(configFile, line);
         istringstream stringStream(line);
         int mode = 0;
         stringStream >> mode;
-        //int parsing
-        cout << mode << endl;
+
         while (getline(configFile, line)) {
             lines.push_back(line);
         }
-        //print all lines from file
-        for (auto it = lines.begin(); it != lines.end(); ++it) {
-            cout << *it << endl;
-        }
-        cout << endl;
 
         configFile.close();
-        //create the matrix
-        if (mode > 0 && mode < 4) {
-            MatrixBuilder *matrixBuilder = new MatrixBuilder(mode);
-            const vector<vector<short>> &matrix = matrixBuilder->constructMatrix(lines);
-            delete matrixBuilder;
-            return matrix;
-        }
+
+        MatrixBuilder matrixBuilder = MatrixBuilder(mode, lines);
+        const vector<vector<int>> matrix = matrixBuilder.getMatrix();
+        return matrix;
     } else {
         cout << "Unable to open file" << endl;
+        const vector<vector<int>> matrix;
+        return matrix;
     }
-    throw -1;
 }
 
 bool indexRectHasValues(vector<vector<int>> indexRect) {
-    return indexRect.size() > 0 && indexRect[indexRect.size() - 1].size() > 0;
+    return !indexRect.empty() && !indexRect.back().empty();
 }
 
-void printMatrix(vector<vector<short>> matrix) {
+void printMatrix(vector<vector<int>> matrix) {
     for (auto it = matrix.begin(); it != matrix.end(); ++it) {
         for (auto elem = it->begin(); elem != it->end(); ++elem) {
             cout << *elem << " ";
         }
         cout << endl;
     }
+    cout << endl;
 }
