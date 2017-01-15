@@ -31,7 +31,13 @@ void MatrixBuilder::constructMatrix(const int mode, const vector<string> lines) 
         }
     } else if (mode == MODE_CUSTOM) {
         for (auto it = lines.begin(); it != lines.end(); ++it) {
-            matrix.push_back(VectorParser::splitAndParseToLine(*it, ' '));
+            const vector<int> &line = VectorParser::splitAndParseToLine(*it, ' ');
+            if (lines.size() == line.size()) {
+                matrix.push_back(line);
+            } else {
+                std::cout << "error: given matrix is not an n*n matrix." << std::endl;
+                return;
+            }
         }
     } else {
         cout << "error: wrong mode." << endl;
