@@ -39,8 +39,8 @@ void MatrixBuilder::constructMatrix(const int mode, const vector<string> lines) 
 }
 
 void MatrixBuilder::drawCompleteRectangle(const int foreground, const vector<pair<int, int>> &coords) {
-    for (int x = coords[0].first; x < coords[1].first; ++x) {
-        for (int y = coords[0].second; y < coords[2].second; ++y) {
+    for (int x = coords[0].first; x <= coords[1].first; ++x) {
+        for (int y = coords[0].second; y <= coords[2].second; ++y) {
             matrix[x][y] = foreground;
         }
     }

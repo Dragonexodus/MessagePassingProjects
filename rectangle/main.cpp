@@ -84,7 +84,6 @@ int search(const vector<vector<int>> &matrix) {
             }
         }
     }
-    //TODO erwartet: 6 6 15 6 6 15 ergebnis: 6:6 14:6 6:14 14:14 !
     if (indexRectHasValues(indexRect)) {
         vector<int> &firstLine = indexRect.front();
         vector<int> &lastLine = indexRect.back();
