@@ -4,13 +4,18 @@
 #include <string>
 #include <vector>
 
-#define MODE_COMPLETE_RECTANGLE 1
-#define MODE_POSITION_PLACEMENT 2
-#define MODE_CUSTOM 3
+enum MODE {
+    MODE_COMPLETE_RECTANGLE,
+    MODE_POSITION_PLACEMENT,
+    MODE_CUSTOM
+};
+
+
 
 using namespace std;
 
 class MatrixBuilder {
+
 public:
     MatrixBuilder(const int mode, const vector<string> lines);
 
@@ -18,12 +23,25 @@ public:
 
     const vector<vector<int>> getMatrix();
 
+    int getMode() const;
+
+    void setMode(int mode);
+
+    const vector<string> &getLines() const;
+
+    void setLines(const vector<string> &lines);
+
+    const vector<vector<int>> constructMatrix();
+
 private:
-    void constructMatrix(const int mode, const vector<string> lines);
 
     void fillBackground(const int n, const int background);
 
     void drawCompleteRectangle(const int foreground, const vector<pair<int, int>> &coords);
+
+    int mode;
+
+    vector<string> lines;
 
     vector<vector<int>> matrix;
 };

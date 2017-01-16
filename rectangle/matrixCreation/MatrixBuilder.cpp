@@ -1,16 +1,17 @@
 #include "MatrixBuilder.h"
 #include "CoordValidator.h"
 #include "VectorParser.h"
-
 #include <iostream>
 
 MatrixBuilder::MatrixBuilder(const int mode, const vector<string> lines) {
-    constructMatrix(mode, lines);
+    this->mode = mode;
+    this->lines = lines;
 }
 
 MatrixBuilder::~MatrixBuilder() {}
 
-void MatrixBuilder::constructMatrix(const int mode, const vector<string> lines) {
+const vector<vector<int>> MatrixBuilder::constructMatrix() {
+    matrix.clear();
     if (mode == MODE_COMPLETE_RECTANGLE || mode == MODE_POSITION_PLACEMENT) {
         int n = atoi(lines[0].c_str());
         int background = atoi(lines[1].c_str()) % 2;
@@ -35,13 +36,13 @@ void MatrixBuilder::constructMatrix(const int mode, const vector<string> lines) 
             if (lines.size() == line.size()) {
                 matrix.push_back(line);
             } else {
-                std::cout << "error: given matrix is not an n*n matrix." << std::endl;
-                return;
+                throw "error: given matrix is not an n*n matrix.";
             }
         }
     } else {
         cout << "error: wrong mode." << endl;
     }
+    return matrix;
 }
 
 void MatrixBuilder::drawCompleteRectangle(const int foreground, const vector<pair<int, int>> &coords) {
@@ -64,4 +65,20 @@ void MatrixBuilder::fillBackground(const int n, const int background) {
 
 const vector<vector<int>> MatrixBuilder::getMatrix() {
     return matrix;
+}
+
+int MatrixBuilder::getMode() const {
+    return mode;
+}
+
+void MatrixBuilder::setMode(int mode) {
+    MatrixBuilder::mode = mode;
+}
+
+const vector<string> &MatrixBuilder::getLines() const {
+    return lines;
+}
+
+void MatrixBuilder::setLines(const vector<string> &lines) {
+    MatrixBuilder::lines = lines;
 }

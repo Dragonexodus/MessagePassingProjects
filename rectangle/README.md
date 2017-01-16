@@ -4,24 +4,22 @@
 
 - Laden eines Files zur Erstellung des Rechtecks
 - Struktur:
-1. Modus: Rechteck erstellen
+0. Modus: Rechteck erstellen
 ```
-1 -- Modus: Rechteck erstellen 
+0 -- Modus: Rechteck erstellen 
 20 -- Angabe von n -> n*n Matrix wird initialisiert
 0 -- 0=schwarz auf weiß, 1=weiß auf schwarz
-10 10 15 10 15 15 10 15 -- Randpunkte Rechteck 
--- x y, x y, x y, x y
--- ersten 4 Werte liefern obere Kante
--- letzten 4 Werte liefern untere Kante
+10 10 15 10 15 10 -- Orts-Randvektoren Rechteck 
+-- x y, x y, x y
 ```
-2. Modus: angabe einzelner Felder
+1. Modus: angabe einzelner Felder
 ```
 2 -- Modus: einzelne Felder angeben
 20 -- Angabe von n -> n*n Matrix wird initialisiert
 0 -- 0=schwarz auf weiß, 1=weiß auf schwarz
-10 10 15 10 15 15 10 15 -- einzelne Felder
+10 10 15 10 15 15 -- einzelne Felder
 ```
-3. Modus: angabe der kompletten Matrix 
+2. Modus: angabe der kompletten Matrix 
 ```
 3 -- Modus: einzelne Felder angeben
 0 0 0 1 -- Matrix 
