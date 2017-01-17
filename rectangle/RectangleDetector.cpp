@@ -17,6 +17,16 @@ int RectangleDetector::testConfigs(const char *term) {
     return searchResult.first;
 }
 
+void RectangleDetector::printResult(int res) {
+    if (res == MISMATCH_FOUND) {
+        cout << "Found some black fields, but no black rectangle!" << endl << endl;;
+    } else if (res == NO_RECT) {
+        cout << "No black fields found!" << endl << endl;
+    } else {
+        cout << "rectangle found: " << endl;
+    }
+}
+
 pair<int, RectangleValidator> RectangleDetector::search(int *matrix, int n, int localSize) {
 
     bool closedRect = false;

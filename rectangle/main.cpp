@@ -62,18 +62,78 @@ int main(int argc, char **argv) {
     } else {
         cout << "rectangle found: " << validator << endl << endl;
     }
-    //TODO verschiebe indicies
+
     int *localResult = new int[5];
     localResult[0] = detectorResult.first;
-    localResult[1] = validator.getStartX();
-    localResult[2] = validator.getStopX();
-    localResult[3] = validator.getStartY();
-    localResult[4] = validator.getStopX();
+    localResult[1] = validator.getStartX() + localN * rank;
+    localResult[2] = validator.getStopX() + localN * rank;
+    localResult[3] = validator.getStartY() + localN * rank;
+    localResult[4] = validator.getStopX() + localN * rank;
     int *mainResult = new int[5 * p];
     MPI_Gather(localResult, 5, MPI_INT, mainResult, 5, MPI_INT, 0, MPI_COMM_WORLD);
+
     if (rank == MASTER) {
-        //TODO: werte alle Results aus
-        detector.printOldMatrix(mainResult, p, 5);
+        //validate res
+        int res = -1;
+        vector<int> members = vector<int>();
+        for (int i = 0; i < p; ++i) {
+            int localRes = mainResult[0 + i * p];
+
+            if (localRes == 0) {
+                res = 0;
+                break;
+            }
+
+            if (i == 0) {
+                res = localRes;
+                if (localRes == 1) {
+                    members.push_back(i);
+                }
+            } else if (localRes == 1) {
+                if (members.size() != 0 && members.back() != i + 1) {
+                    res = 0;
+                    break;
+                }
+                members.push_back(i);
+                if (res == 2) {
+                    res = localRes;
+                }
+            }
+        }
+
+//check the validation of the rectangle
+        if (res == 1) {
+            int xSize = 0;
+            int beginY = -1;
+            int endY = -1;
+            int beginX = -1;
+            int endX = -1;
+            for (auto it = members.begin(); it != members.end(); ++it) {
+                int startX = mainResult[1 + it * p];
+                int startY = mainResult[2 + it * p];
+                int stopX = mainResult[3 + it * p];
+                int stopY = mainResult[4 + it * p];
+
+                if (it == members.begin()) {
+                    beginY = startY;
+                    endY = stopY;
+                    xSize = stopX - startX;
+                    endX = stopX;
+                } else {
+                    if (xSize != stopX - startX || beginY != startY || endY != stopY || endX != startX - 1) {
+                        res = 0;
+                        break;
+                    }
+                    endX = stopX;
+                }
+            }
+        }
+        detector.printResult(res);
+        if (res == 1) {
+            validator.setStart(make_pair(mainResult[1], mainResult[2]));
+            validator.setStop(make_pair(mainResult[3 + (p - 1) * p], mainResult[4 + (p - 1) * p]));
+            cout << validator << endl << endl;
+        }
     }
 
     delete localMatrix;

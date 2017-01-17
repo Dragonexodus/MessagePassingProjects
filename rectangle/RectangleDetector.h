@@ -32,6 +32,8 @@ public:
     };
 
     void printOldMatrix(int *array, int n, int m);
+
+    void printResult(int res);
 };
 
 #endif //PROJECT_RECTANGLEDETECTOR_H
