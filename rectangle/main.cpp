@@ -2,7 +2,7 @@
 #include "RectangleDetector.h"
 #include <mpi.h>
 
-int **initEmpty(int sizeX, int sizeY);
+int *initEmpty(int sizeX, int sizeY);
 
 using namespace std;
 
@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
     int localN = 0;
     int localMatrixSize = 0;
     vector<vector<int>> *matrix = new vector<vector<int>>;
-
     if (rank == MASTER) {
         *matrix = detector.readFile("config");
         localN = matrix->size() / p;
@@ -40,28 +39,33 @@ int main(int argc, char **argv) {
 
         detector.printMatrix(*matrix);
         cout << "size of matrix:" << matrix->size() << endl;
-        int **newMatrix = initEmpty(matrix->size(), matrix->size());
+        int *newMatrix = initEmpty(matrix->size(), matrix->size());
         _copy(newMatrix, *matrix, matrix->size(), matrix->size());
 
         for (int i = 1; i < p; i++) {
             //TODO convert to array
-            MPI_Send(&(newMatrix[i * localN][0]), localMatrixSize, MPI_INT, i, 100, MPI_COMM_WORLD);
+            int pos = i * localN;
+            //   cout<<"sending array with size:"<<localMatrixSize<<" from pos: "<<pos<<":"<<0<<endl;
+            MPI_Send(&newMatrix[pos], localMatrixSize, MPI_INT, i, 100, MPI_COMM_WORLD);
         }
     } else {
         MPI_Bcast(&localMatrixSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        int **array = initEmpty(2, 8);
+        int *array = initEmpty(2, 8);
 
-        MPI_Recv(&array[0][0], localMatrixSize, MPI_INT, 0, 100, MPI_COMM_WORLD, &status);
+        MPI_Recv(&array[0], localMatrixSize, MPI_INT, 0, 100, MPI_COMM_WORLD, &status);
         cout << "r" << rank << endl;
-        if (rank == 3) {
-            detector.printOldMatrix(array, 2, 8);
-        }
-        for (int i = 0; i < 8; ++i) {
-            //     delete array[i];
-        }
-        //delete array;
-    }
 
+        if (rank == 3) {
+            // detector.printOldMatrix(array, 2, 8);
+        }
+        for (int i = 0; i < 2; ++i) {
+            delete array[i];
+        }
+        delete array;
+    }
+    /*MPI_Scatter(rectangle, rowsPart * columns, MPI_CHAR, rectanglePart,
+                rowsPart * columns, MPI_CHAR, 0, MPI_COMM_WORLD);
+*/
 
 
     /*if(rank == MASTER){
@@ -85,21 +89,18 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int **initEmpty(int sizeX, int sizeY) {
-    int **array = new int *[sizeY];
-    for (int i = 0; i < sizeY; ++i) {
-        array[i] = new int[sizeX];
-        for (int j = 0; j < sizeX; j++) {
-            array[i][j] = 0;
-        }
+int *initEmpty(int sizeX, int sizeY) {
+    int *array = new int[sizeY * sizeX];
+    for (int i = 0; i < sizeY * sizeX; ++i) {
+        array[i] = 0;
     }
     return array;
 }
 
-void _copy(int **newarray, vector<vector<int>> matrix, int sizeX, int sizeY) {
+void _copy(int *newarray, vector<vector<int>> matrix, int sizeX, int sizeY) {
     for (int i = 0; i < sizeY; ++i) {
         for (int j = 0; j < sizeX; ++j) {
-            newarray[i][j] = matrix[i][j];
+            newarray[i * sizeX + j] = matrix[i][j];
         }
     }
 }
