@@ -106,6 +106,16 @@ void RectangleDetector::printMatrix(vector<vector<int>> matrix) {
     }
 }
 
+void RectangleDetector::printOldMatrix(int **array, int n, int m) {
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            cout << " RANK 1: " << array[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
 RectangleDetector::RectangleDetector() {}
 
 RectangleDetector::~RectangleDetector() {}

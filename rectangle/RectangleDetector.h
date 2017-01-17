@@ -30,6 +30,8 @@ public:
         RECT_FOUND,
         NO_RECT
     };
+
+    void printOldMatrix(int **array, int n, int m);
 };
 
 #endif //PROJECT_RECTANGLEDETECTOR_H
