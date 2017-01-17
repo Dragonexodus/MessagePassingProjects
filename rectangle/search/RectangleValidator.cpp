@@ -68,11 +68,11 @@ int RectangleValidator::calcEndX() const {
     return start.first + xSize - 1;
 }
 
-const pair<int, int> RectangleValidator::getYs() {
+pair<int, int> RectangleValidator::getYs() {
     return make_pair(getStartY(), getStopY());
 }
 
-const pair<int, int> RectangleValidator::getXs() {
+pair<int, int> RectangleValidator::getXs() {
     return make_pair(getStartX(), getStopX());
 }
 

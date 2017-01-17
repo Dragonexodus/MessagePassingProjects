@@ -53,16 +53,32 @@ int main(int argc, char **argv) {
         delete matrix;
     }
     detector.printOldMatrix(localMatrix, localN, n);
-    const pair<int, RectangleValidator> &result = detector.search(localMatrix, n, localN);
-    if (result.first == detector.MISMATCH_FOUND) {
+    const pair<int, RectangleValidator> &detectorResult = detector.search(localMatrix, n, localN);
+    RectangleValidator validator = detectorResult.second;
+    if (detectorResult.first == detector.MISMATCH_FOUND) {
         cout << "Found some black fields, but no black rectangle!" << endl << endl;;
-    } else if (result.first == detector.NO_RECT) {
+    } else if (detectorResult.first == detector.NO_RECT) {
         cout << "No black fields found!" << endl << endl;
     } else {
-        cout << "rectangle found: " << result.second << endl << endl;
+        cout << "rectangle found: " << validator << endl << endl;
     }
-    //TODO Gather 5er Array und verschiebe indicies, dann ermittle Rechteckkoordinaten
+    //TODO verschiebe indicies
+    int *localResult = new int[5];
+    localResult[0] = detectorResult.first;
+    localResult[1] = validator.getStartX();
+    localResult[2] = validator.getStopX();
+    localResult[3] = validator.getStartY();
+    localResult[4] = validator.getStopX();
+    int *mainResult = new int[5 * p];
+    MPI_Gather(localResult, 5, MPI_INT, mainResult, 5, MPI_INT, 0, MPI_COMM_WORLD);
+    if (rank == MASTER) {
+        //TODO: werte alle Results aus
+        detector.printOldMatrix(mainResult, p, 5);
+    }
+
     delete localMatrix;
+    delete localResult;
+    delete mainResult;
     MPI_Finalize();
 
     return EXIT_SUCCESS;

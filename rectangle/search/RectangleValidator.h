@@ -41,9 +41,9 @@ public:
 
     int calcEndX() const;
 
-    const pair<int, int> getYs();
+    pair<int, int> getYs();
 
-    const pair<int, int> getXs();
+    pair<int, int> getXs();
 
     const bool hasValue();
 
