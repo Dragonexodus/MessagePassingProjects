@@ -41,6 +41,24 @@ public:
 
     int calcEndX() const;
 
+    const pair<int, int> getYs();
+
+    const pair<int, int> getXs();
+
+    const bool hasValue();
+
+    const bool foundNoBlackInLineButRectExists(const int y);
+
+    const bool inStartLine(const int y);
+
+    const bool leftBorderMismatch(const int x, const int y);
+
+    const bool rightBorderMismatch(const int x, const int y);
+
+    const bool xNotUnderUpperBorder(const int x);
+
+    const bool xIsNotSuccessor(const int x);
+
     friend std::ostream &operator<<(std::ostream &os, const RectangleValidator &validator);
 
 private:

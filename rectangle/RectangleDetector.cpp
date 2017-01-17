@@ -16,8 +16,6 @@ int RectangleDetector::testConfigs(const char *term) {
     return searchResult.first;
 }
 
-//TODO Refactor, weniger returns, aufteilen in diverse methoden, evtl. sogar als objekt
-//TODO Aufteilung im Validator
 pair<int, RectangleValidator> RectangleDetector::search(const vector<vector<int>> &matrix) {
     bool closedRect = false;
     RectangleValidator validator = RectangleValidator();
@@ -31,24 +29,17 @@ pair<int, RectangleValidator> RectangleDetector::search(const vector<vector<int>
 
             if (!color) {
                 if (!validator.startEmpty()) {
-                    if (validator.getStartY() == y) {
-                        if ((validator.calcEndX() + 1) != x) {
-                            return make_pair(MISMATCH_FOUND,
-                                             validator);//Anfangszeile: 0 ok, 1 ok da erlaubt, 0 Prüfung über Indizeberechnung
+                    if (validator.inStartLine(y)) {
+                        if (validator.xIsNotSuccessor(x)) {
+                            return make_pair(MISMATCH_FOUND, validator);
                         }
                         validator.incXSize();
                     } else {
-                        if (x < validator.getStartX() || validator.calcEndX() < x) {
-                            return make_pair(MISMATCH_FOUND,
-                                             validator); // linker und rechter rand falls in der vorherigen zeile etwas gefunden
+                        if (validator.xNotUnderUpperBorder(x)) {
+                            return make_pair(MISMATCH_FOUND, validator);
                         }
-                        if (validator.getStopY() != y && validator.getStartX() != x) {
-                            if (validator.getStartX() <= x && x <= validator.calcEndX()) {
-                                return make_pair(MISMATCH_FOUND,
-                                                 validator); // weiß unter schwarz, und rechter rand falls in der vorherigen zeile etwas gefunden
-                                // 0 0
-                                // 1 0
-                            }
+                        if (validator.leftBorderMismatch(x, y)) {
+                            return make_pair(MISMATCH_FOUND, validator);
                         }
                     }
                 } else {
@@ -57,26 +48,18 @@ pair<int, RectangleValidator> RectangleDetector::search(const vector<vector<int>
                 }
                 validator.setStop(make_pair(x, y));
             } else {
-                if (!validator.startEmpty()) {
-                    if (validator.getStopY() != y) {
-                        if (x == matrix.size() - 1) {
-                            closedRect = true;
-                        }
+                if (validator.foundNoBlackInLineButRectExists(y)) {
+                    if (x == matrix.size() - 1) {
+                        closedRect = true;
                     }
                 }
-
-                if (validator.getStartY() != y && validator.getStopY() == y) {
-                    if (validator.getStartX() <= x && x <= validator.calcEndX()) {
-                        return make_pair(MISMATCH_FOUND,
-                                         validator); // weiß unter schwarz, und rechter rand falls in der vorherigen zeile etwas gefunden
-                        // 0 0
-                        // 0 1
-                    }
+                if (validator.rightBorderMismatch(x, y)) {
+                    return make_pair(MISMATCH_FOUND, validator);
                 }
             }
         }
     }
-    if (!validator.stopEmpty() && !validator.startEmpty()) {
+    if (validator.hasValue()) {
         return make_pair(RECT_FOUND, validator);
     }
     return make_pair(NO_RECT, validator);//no rect found
