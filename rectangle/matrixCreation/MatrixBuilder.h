@@ -10,8 +10,6 @@ enum MODE {
     MODE_CUSTOM
 };
 
-
-
 using namespace std;
 
 class MatrixBuilder {
@@ -21,17 +19,19 @@ public:
 
     ~MatrixBuilder();
 
-    const vector<vector<int>> getMatrix();
+    const int *getMatrix();
 
     int getMode() const;
 
     void setMode(int mode);
 
+    int getN() const;
+
     const vector<string> &getLines() const;
 
     void setLines(const vector<string> &lines);
 
-    const vector<vector<int>> constructMatrix();
+    int *constructMatrix();
 
 private:
 
@@ -41,9 +41,11 @@ private:
 
     int mode;
 
+    int n;
+
     vector<string> lines;
 
-    vector<vector<int>> matrix;
+    int *matrix;
 };
 
 

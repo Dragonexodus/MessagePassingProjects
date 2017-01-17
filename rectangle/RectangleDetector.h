@@ -15,11 +15,11 @@ class RectangleDetector {
 public:
     RectangleDetector();
 
-    virtual ~RectangleDetector();
+    ~RectangleDetector();
 
-    pair<int, RectangleValidator> search(const vector<vector<int>> &matrix);
+    pair<int, RectangleValidator> search(int *matrix, int n, int i);
 
-    const vector<vector<int>> readFile(const char *term);
+    const pair<int *, int> readFile(const char *term);
 
     void printMatrix(vector<vector<int>> matrix);
 
