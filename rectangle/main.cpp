@@ -6,7 +6,7 @@ int *initEmpty(int sizeX, int sizeY);
 
 using namespace std;
 
-void _copy(int **newarray, vector<vector<int>> matrix, int sizeX, int sizeY);
+void _copy(int *newarray, vector<vector<int>> matrix, int sizeX, int sizeY);
 
 int main(int argc, char **argv) {
     const int MASTER = 0;
@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
 
         for (int i = 1; i < p; i++) {
             //TODO convert to array
-            int pos = i * localN;
+            int pos = i * localMatrixSize;
+            cout << pos << endl;
             //   cout<<"sending array with size:"<<localMatrixSize<<" from pos: "<<pos<<":"<<0<<endl;
             MPI_Send(&newMatrix[pos], localMatrixSize, MPI_INT, i, 100, MPI_COMM_WORLD);
         }
@@ -55,13 +56,11 @@ int main(int argc, char **argv) {
         MPI_Recv(&array[0], localMatrixSize, MPI_INT, 0, 100, MPI_COMM_WORLD, &status);
         cout << "r" << rank << endl;
 
-        if (rank == 3) {
-            // detector.printOldMatrix(array, 2, 8);
-        }
+        detector.printOldMatrix(array, 2, 8);
         for (int i = 0; i < 2; ++i) {
-            delete array[i];
+            //delete array;
         }
-        delete array;
+        //delete array;
     }
     /*MPI_Scatter(rectangle, rowsPart * columns, MPI_CHAR, rectanglePart,
                 rowsPart * columns, MPI_CHAR, 0, MPI_COMM_WORLD);
