@@ -2,13 +2,12 @@
 #include "RectangleDetector.h"
 #include <mpi.h>
 
-int **initEmpty();
+int **initEmpty(int sizeX, int sizeY);
 
 using namespace std;
 
-void copy(int **newarray, vector<vector<int>> matrix, int n);
+void _copy(int **newarray, vector<vector<int>> matrix, int sizeX, int sizeY);
 
-int **initEmpty();
 int main(int argc, char **argv) {
     const int MASTER = 0;
     int p;
@@ -27,38 +26,40 @@ int main(int argc, char **argv) {
     MPI_Status status;
 
     RectangleDetector detector = RectangleDetector();
-    vector<vector<int>> *matrix = new vector<vector<int>>;
-    vector<vector<int>> *localMatrix = new vector<vector<int>>;
     //double startTimer = MPI_Wtime();
-    unsigned long localN = 0;
+    int localN = 0;
     int localMatrixSize = 0;
+    vector<vector<int>> *matrix = new vector<vector<int>>;
 
     if (rank == MASTER) {
         *matrix = detector.readFile("config");
         localN = matrix->size() / p;
-        int localMatrixSize = (int) (matrix->front().size() * localN);
+        int localMatrixSize = matrix->front().size() * localN;
+
         MPI_Bcast(&localMatrixSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
         detector.printMatrix(*matrix);
         cout << "size of matrix:" << matrix->size() << endl;
-        int **newMatrix = initEmpty();
-        copy(newMatrix, *matrix, matrix->size());
-        detector.printOldMatrix(newMatrix, 8, 8);
-        for (int i = 1; i < localN; i++) {
+        int **newMatrix = initEmpty(matrix->size(), matrix->size());
+        _copy(newMatrix, *matrix, matrix->size(), matrix->size());
+
+        for (int i = 1; i < p; i++) {
             //TODO convert to array
-            MPI_Send(&(newMatrix[i * localN][0]), localMatrixSize, MPI_INT, i, i, MPI_COMM_WORLD);
+            MPI_Send(&(newMatrix[i * localN][0]), localMatrixSize, MPI_INT, i, 100, MPI_COMM_WORLD);
         }
     } else {
         MPI_Bcast(&localMatrixSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        int **array = initEmpty();
-        MPI_Recv(array, localMatrixSize, MPI_INT, 0, rank, MPI_COMM_WORLD, &status);
-        if (rank == 1) {
+        int **array = initEmpty(2, 8);
+
+        MPI_Recv(&array[0][0], localMatrixSize, MPI_INT, 0, 100, MPI_COMM_WORLD, &status);
+        cout << "r" << rank << endl;
+        if (rank == 3) {
             detector.printOldMatrix(array, 2, 8);
         }
         for (int i = 0; i < 8; ++i) {
-            delete array[i];
+            //     delete array[i];
         }
-        delete array;
+        //delete array;
     }
 
 
@@ -76,26 +77,28 @@ int main(int argc, char **argv) {
         double stopTimer = MPI_Wtime();
         std::cout << "Benötigte Zeit: " << stopTimer - startTimer << std::endl;
     }*/
-    if (matrix != NULL) {
-        delete matrix;
-    }
+
+    //TODO Segmenentation-Fault wegen nicht korrekt freigegebenen speicher
 
     MPI_Finalize();
 
     return EXIT_SUCCESS;
 }
 
-int **initEmpty() {
-    int **array = new int *[8];
-    for (int i = 0; i < 8; ++i) {
-        array[i] = new int[8];
+int **initEmpty(int sizeX, int sizeY) {
+    int **array = new int *[sizeY];
+    for (int i = 0; i < sizeY; ++i) {
+        array[i] = new int[sizeX];
+        for (int j = 0; j < sizeX; j++) {
+            array[i][j] = 0;
+        }
     }
     return array;
 }
 
-void copy(int **newarray, vector<vector<int>> matrix, int n) {
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
+void _copy(int **newarray, vector<vector<int>> matrix, int sizeX, int sizeY) {
+    for (int i = 0; i < sizeY; ++i) {
+        for (int j = 0; j < sizeX; ++j) {
             newarray[i][j] = matrix[i][j];
         }
     }
