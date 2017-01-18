@@ -130,8 +130,8 @@ int main(int argc, char **argv) {
         }
         detector.printResult(res);
         if (res == 1) {
-            validator.setStart(make_pair(mainResult[1], mainResult[2]));
-            validator.setStop(make_pair(mainResult[3 + (p - 1) * p], mainResult[4 + (p - 1) * p]));
+            validator.setStart(make_pair(mainResult[1 + members.front() * p], mainResult[2 + members.front() * p]));
+            validator.setStop(make_pair(mainResult[3 + members.back() * p], mainResult[4 + members.back() * p]));
             cout << validator << endl << endl;
         }
     }
