@@ -109,10 +109,10 @@ int main(int argc, char **argv) {
             int beginX = -1;
             int endX = -1;
             for (auto it = members.begin(); it != members.end(); ++it) {
-                int startX = mainResult[1 + it * p];
-                int startY = mainResult[2 + it * p];
-                int stopX = mainResult[3 + it * p];
-                int stopY = mainResult[4 + it * p];
+                int startX = mainResult[1 + *it * p];
+                int startY = mainResult[2 + *it * p];
+                int stopX = mainResult[3 + *it * p];
+                int stopY = mainResult[4 + *it * p];
 
                 if (it == members.begin()) {
                     beginY = startY;
