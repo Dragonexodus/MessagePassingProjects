@@ -19,7 +19,7 @@ public:
 
     ~MatrixBuilder();
 
-    const int *getMatrix();
+    const short *getMatrix();
 
     int getMode() const;
 
@@ -31,7 +31,7 @@ public:
 
     void setLines(const vector<string> &lines);
 
-    int *constructMatrix();
+    short *constructMatrix();
 
 private:
 
@@ -45,7 +45,7 @@ private:
 
     vector<string> lines;
 
-    int *matrix;
+    short *matrix;
 };
 
 
