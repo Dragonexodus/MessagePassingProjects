@@ -31,7 +31,7 @@ short *MatrixBuilder::constructMatrix() {
                 }
             }
         } else {
-            std::cout << "error: validation of rectangle failure." << std::endl;
+            matrixError("error: validation of rectangle failure.");
         }
     } else if (mode == MODE_CUSTOM) {
         n = lines.size();
@@ -43,13 +43,18 @@ short *MatrixBuilder::constructMatrix() {
                     matrix[y * n + x] = line[x];
                 }
             } else {
-                throw "error: given matrix is not an n*n matrix.";
+                matrixError("error: given matrix is not an n*n matrix.");
             }
         }
     } else {
-        cout << "error: wrong mode." << endl;
+        matrixError("error: wrong mode.");
     }
     return matrix;
+}
+
+void MatrixBuilder::matrixError(string message) {
+    cout << message << endl;
+    this->matrix = NULL;
 }
 
 void MatrixBuilder::drawCompleteRectangle(const int foreground, const vector<pair<int, int>> &coords) {

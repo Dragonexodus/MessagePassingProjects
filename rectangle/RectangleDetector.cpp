@@ -84,9 +84,8 @@ pair<int, RectangleValidator> RectangleDetector::search(short *matrix, int n, in
  * @return a matrix with found values, if nothing found an empty matrix is returned
  */
 const pair<short *, int> RectangleDetector::readFile(const char *term) {
-
+    pair<short *, int> nothing = make_pair(new short[0], -1);
     ifstream configFile(term);
-
     if (configFile.is_open()) {
         string line;
         vector<string> lines;
@@ -103,11 +102,14 @@ const pair<short *, int> RectangleDetector::readFile(const char *term) {
 
         MatrixBuilder matrixBuilder = MatrixBuilder(mode, lines);
         short *matrix = matrixBuilder.constructMatrix();
+        if (matrix == NULL) {
+            return nothing;
+        }
         int n = matrixBuilder.getN();
         return make_pair(matrix, n);
     } else {
-        //cout << "Unable to open file" << endl;
-        throw "";
+        cout << "Unable to open file" << endl;
+        return nothing;
     }
 }
 
