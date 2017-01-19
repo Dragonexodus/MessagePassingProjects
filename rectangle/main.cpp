@@ -48,11 +48,10 @@ int main(int argc, char **argv) {
         MPI_Finalize();
         return EXIT_SUCCESS;
     }
-
     int localN = n / p;
     int localSize = localN * n;
     short *localMatrix = new short[localSize];
-
+    //TODO: if p = 1 then only detector.search(matrix,n,n)
     MPI_Scatter(matrix, localSize, MPI_SHORT, localMatrix, localSize, MPI_SHORT, 0, MPI_COMM_WORLD);
     if (rank == MASTER && matrix != NULL) {
         delete matrix;
@@ -77,12 +76,12 @@ int main(int argc, char **argv) {
             int localRes = mainResult[0 + i * RETURN_COUNT];
 
             if (localRes == detector.MISMATCH_FOUND) {
-                res = detector.MISMATCH_FOUND;
-                break;
-            }
+                    res = detector.MISMATCH_FOUND;
+                    break;
+                }
 
             if (i == 0) {
-                res = localRes;
+                    res = localRes;
                 if (localRes == detector.RECT_FOUND) {
                     members.push_back(i);
                 }
@@ -95,8 +94,8 @@ int main(int argc, char **argv) {
                 if (res == detector.NO_RECT) {
                     res = localRes;
                 }
+                }
             }
-        }
 
 //check the validation of the rectangle
         if (res == detector.RECT_FOUND) {
@@ -119,9 +118,9 @@ int main(int argc, char **argv) {
                         break;
                     }
                     endY = stopY;
+                    }
                 }
             }
-        }
         detector.printResult(res);
         if (res == detector.RECT_FOUND) {
             validator.setStart(make_pair(mainResult[1 + members.front() * RETURN_COUNT],
@@ -130,7 +129,7 @@ int main(int argc, char **argv) {
                                         mainResult[4 + members.back() * RETURN_COUNT]));
             //cout << validator << endl << endl;
         }
-    }
+        }
     double stopTime = MPI_Wtime();
     if (rank == MASTER) {
         cout << stopTime - startTime << endl;
