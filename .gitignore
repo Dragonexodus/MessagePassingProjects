@@ -42,3 +42,4 @@ Würde rectangle/main.cpp löschen
 /documentation/build/*
 /documentation/Bericht.pdf
 *.bak
+/documentation/Messdaten.csv
