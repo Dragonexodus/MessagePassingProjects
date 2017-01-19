@@ -40,3 +40,7 @@ Würde rectangle/Debug/ löschen
 Würde rectangle/main.cpp löschen
 /cmake-build-debug/
 /copyFiles.sh
+/documentation/build/
+/documentation/Bericht.pdf
+/documentation/Bericht.tex.bak
+/documentation/Messdaten.csv
