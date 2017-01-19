@@ -33,13 +33,70 @@ eingesehen werden.
 %Kommunikationsoverhead
 \subsection{Laufzeitverhalten}
 % Auswertungsoverhead durch Master (Auswertung von Gather - parallel)
-%Beispiel .csv
-%Anzahl	T-Wert
-%4812	7.027466627
-%8989	9.4135177029
-%12032	10.0600658745
-%94399	10.0270125326
-%200580	10.0075516954
+
+\subsubsection{Festes n}
+\begin{tikzpicture}
+%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
+%Tests mit manuell angepasster csv haben geklappt... o.O
+\begin{axis}
+[            axis x line=middle,
+            axis y line=middle,
+            enlarge y limits=true,
+            width=15cm, height=8cm,     % size of the image
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=n,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/88/measure0.csv};
+\addplot[blue, mark=*] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/88/measure1.csv};
+\addplot[red, mark=+] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/88/measure2.csv};
+\legend{0,1,2}
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
+%Tests mit manuell angepasster csv haben geklappt... o.O
+\begin{axis}
+[            axis x line=middle,
+            axis y line=middle,
+            enlarge y limits=true,
+            width=15cm, height=8cm,     % size of the image
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=n,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/44/measure0.csv};
+\addplot[blue, mark=*] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/44/measure1.csv};
+\addplot[red, mark=+] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/44/measure2.csv};
+\legend{0,1,2}
+\end{axis}
+\end{tikzpicture}
+\subsubsection{Festes p}
+\begin{tikzpicture}
+%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
+%Tests mit manuell angepasster csv haben geklappt... o.O
+\begin{axis}
+[            axis x line=middle,
+            axis y line=middle,
+            enlarge y limits=true,
+            width=15cm, height=8cm,     % size of the image
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=hosts,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\addplot[blue, mark=*] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[red, mark=+] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\legend{0,1,2}
+\end{axis}
+\end{tikzpicture}
 
 \begin{tikzpicture}
 %TODO csv wird noch nicht richtig gelesen, falsche formatierung?
@@ -55,14 +112,12 @@ eingesehen werden.
             xlabel=hosts,
             legend style={at={(0.1,-0.1)}, anchor=north}
 ]
-\addplot[black, mark=x] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure.csv};
-\legend{Messwerte}
+\addplot[black, mark=x] table [x=hosts, y=T2 , col sep=space] {../rectangle/measures/processorScaling/88/40000/measure0.csv};
+\addplot[blue, mark=*] table [x=hosts, y=T2 , col sep=space] {../rectangle/measures/processorScaling/88/40000/measure1.csv};
+\addplot[red, mark=+] table [x=hosts, y=T2 , col sep=space] {../rectangle/measures/processorScaling/88/40000/measure2.csv};
+\legend{0,1,2}
 \end{axis}
 \end{tikzpicture}
-
-\subsubsection{Festes n}
-\subsubsection{Festes p}
-
 \subsection{Fazit}
 
 \section{Projektaufgabe 2: Numerische Integration mittels Parabelformel}
