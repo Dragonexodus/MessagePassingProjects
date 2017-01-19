@@ -17,11 +17,9 @@ public:
 
     ~RectangleDetector();
 
-    pair<int, RectangleValidator> search(int *matrix, int n, int i);
+    pair<int, RectangleValidator> search(short *matrix, int n, int i);
 
-    const pair<int *, int> readFile(const char *term);
-
-    void printMatrix(vector<vector<int>> matrix);
+    const pair<short *, int> readFile(const char *term);
 
     int testConfigs(const char *term);
 
@@ -31,7 +29,10 @@ public:
         NO_RECT
     };
 
+    void printOldMatrix(short *array, int n, int m);
     void printOldMatrix(int *array, int n, int m);
+
+    void printResult(int res);
 };
 
 #endif //PROJECT_RECTANGLEDETECTOR_H
