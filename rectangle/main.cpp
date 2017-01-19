@@ -1,7 +1,6 @@
 #include <iostream>
 #include "RectangleDetector.h"
 #include <mpi.h>
-#include <string>
 
 static const int RETURN_COUNT = 5;
 using namespace std;
@@ -115,7 +114,7 @@ int main(int argc, char **argv) {
                     endX = stopX;
                 } else {
                     if (endX != stopX || beginX != startX || endY != startY - 1) {
-                        cout << "closedRect" << endl;
+                        //cout << "closedRect" << endl;
                         res = detector.MISMATCH_FOUND;
                         break;
                     }
@@ -134,7 +133,8 @@ int main(int argc, char **argv) {
     }
     double stopTime = MPI_Wtime();
     if (rank == MASTER) {
-        cout << "T(" << n << ") = " << stopTime - startTime << " ms" << endl;
+        cout << stopTime - startTime << endl;
+        cout << "T(" << n << ") = " << stopTime - startTime << " s" << endl;
         cout << "----------------------------------------------" << endl << endl;
     }
     delete localMatrix;

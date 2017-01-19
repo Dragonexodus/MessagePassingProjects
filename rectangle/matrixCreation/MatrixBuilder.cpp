@@ -23,9 +23,9 @@ short *MatrixBuilder::constructMatrix() {
         if (validator.getValidation()) {
             this->matrix = new short[n * n];
             fillBackground(n, background);
-            if (mode == MODE_COMPLETE_RECTANGLE) {
+            if (mode == MODE_COMPLETE_RECTANGLE && !coords.empty()) {
                 drawCompleteRectangle(foreground, coords);
-            } else {
+            } else if (!coords.empty()) {
                 for (auto it = coords.begin(); it != coords.end(); ++it) {
                     matrix[it->first * n + it->second] = foreground;
                 }
