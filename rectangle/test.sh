@@ -8,17 +8,20 @@ cd rectangle/RELEASE/
 echo "Starting rectanglePatternDetection:......."
 echo "------------------------------------------"
 
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../config
+pathToConfig="../testConfigs/"
+hostFileDir="../hosts"
 
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/nothingFound1
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/rectFound1
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/rectFound2
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/rectFound3
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/rectFound4
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/rectFound5
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/rectFound6
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/somethingElseFound1
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/somethingElseFound2
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/somethingElseFound3
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/somethingElseFound4
-mpirun -np 2 -hostfile ../hosts rectanglePatternDetection ../testConfigs/somethingElseFound5
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection ../config
+
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/nothingFound1
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/rectFound1
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/rectFound2
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/rectFound3
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/rectFound4
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/rectFound5
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/rectFound6
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/somethingElseFound1
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/somethingElseFound2
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/somethingElseFound3
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/somethingElseFound4
+mpirun -np 2 -hostfile $hostFileDir rectanglePatternDetection $pathToConfig/somethingElseFound5
