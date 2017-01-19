@@ -128,14 +128,14 @@ int main(int argc, char **argv) {
                                          mainResult[3 + members.front() * RETURN_COUNT]));
             validator.setStop(make_pair(mainResult[2 + members.back() * RETURN_COUNT],
                                         mainResult[4 + members.back() * RETURN_COUNT]));
-            cout << validator << endl << endl;
+            //cout << validator << endl << endl;
         }
     }
     double stopTime = MPI_Wtime();
     if (rank == MASTER) {
         cout << stopTime - startTime << endl;
-        cout << "T(" << n << ") = " << stopTime - startTime << " s" << endl;
-        cout << "----------------------------------------------" << endl << endl;
+        //cout << "T(" << n << ") = " << stopTime - startTime << " s" << endl;
+        //cout << "----------------------------------------------" << endl << endl;
     }
     delete localMatrix;
     delete localResult;

@@ -9,18 +9,18 @@ int RectangleDetector::testConfigs(const char *term) {
     pair<int, RectangleValidator> searchResult = search(matrix, n, n);
     printResult(searchResult.first);
     if (searchResult.first == RECT_FOUND) {
-        cout << searchResult.second << endl;
+        //cout << searchResult.second << endl;
     }
     return searchResult.first;
 }
 
 void RectangleDetector::printResult(int res) {
     if (res == MISMATCH_FOUND) {
-        cout << "Found some black fields, but no black rectangle!" << endl << endl;;
+        //cout << "Found some black fields, but no black rectangle!" << endl << endl;;
     } else if (res == NO_RECT) {
-        cout << "No black fields found!" << endl << endl;
+        //cout << "No black fields found!" << endl << endl;
     } else {
-        cout << "rectangle found: " << endl;
+        //cout << "rectangle found: " << endl;
     }
 }
 
@@ -33,7 +33,7 @@ pair<int, RectangleValidator> RectangleDetector::search(short *matrix, int n, in
         for (int x = 0; x < n; x++) {
             short color = matrix[y * n + x];
             if (!color && closedRect) {
-                cout << "closedRect" << endl;
+                //cout << "closedRect" << endl;
                 return make_pair(MISMATCH_FOUND, validator);//black found but rectangle is closed;
             }
 
@@ -41,17 +41,17 @@ pair<int, RectangleValidator> RectangleDetector::search(short *matrix, int n, in
                 if (!validator.startEmpty()) {
                     if (validator.inStartLine(y)) {
                         if (validator.xIsNotSuccessor(x)) {
-                            cout << "xIsNotSuccessor" << endl;
+                            //cout << "xIsNotSuccessor" << endl;
                             return make_pair(MISMATCH_FOUND, validator);
                         }
                         validator.incXSize();
                     } else {
                         if (validator.xNotUnderUpperBorder(x)) {
-                            cout << "xNotUnderUpperBorder" << endl;
+                            //cout << "xNotUnderUpperBorder" << endl;
                             return make_pair(MISMATCH_FOUND, validator);
                         }
                         if (validator.leftBorderMismatch(x, y)) {
-                            cout << "leftBorderMismatch" << endl;
+                            //cout << "leftBorderMismatch" << endl;
                             return make_pair(MISMATCH_FOUND, validator);
                         }
                     }
@@ -67,7 +67,7 @@ pair<int, RectangleValidator> RectangleDetector::search(short *matrix, int n, in
                     }
                 }
                 if (validator.rightBorderMismatch(x, y)) {
-                    cout << "rightBorderMismatch" << endl;
+                    //cout << "rightBorderMismatch" << endl;
                     return make_pair(MISMATCH_FOUND, validator);
                 }
             }
@@ -106,7 +106,7 @@ const pair<short *, int> RectangleDetector::readFile(const char *term) {
         int n = matrixBuilder.getN();
         return make_pair(matrix, n);
     } else {
-        cout << "Unable to open file" << endl;
+        //cout << "Unable to open file" << endl;
         throw "";
     }
 }
@@ -114,21 +114,21 @@ const pair<short *, int> RectangleDetector::readFile(const char *term) {
 void RectangleDetector::printOldMatrix(short *array, int n, int m) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; ++j) {
-            cout << array[i * m + j] << " ";
+            //cout << array[i * m + j] << " ";
         }
-        cout << endl;
+        //cout << endl;
     }
-    cout << endl;
+    //cout << endl;
 }
 
 void RectangleDetector::printOldMatrix(int *array, int n, int m) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; ++j) {
-            cout << array[i * m + j] << " ";
+            //cout << array[i * m + j] << " ";
         }
-        cout << endl;
+        //cout << endl;
     }
-    cout << endl;
+    //cout << endl;
 }
 
 RectangleDetector::RectangleDetector() {}
