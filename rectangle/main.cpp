@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
             configFile = argv[1];
         }
         pair<short *, int> result = detector.readFile(configFile.c_str());
-        if (result.second != INVALID_VALUE) {
+        if (result.second <= INVALID_VALUE) {
             n = result.second;
             matrix = result.first;
             if (n % p != 0) {

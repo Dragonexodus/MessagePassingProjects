@@ -1,12 +1,13 @@
 \input{Header}	
 
 \usepackage{pgfplots}
+
 \usepackage{filecontents}
 					
 \title{Dokumentation zu den Projektaufgaben 1 und 2}
 \subtitle{Message Passing Programmierung\vspace{1cm}}
 
-\author{}
+\author{M. Zober, M. Horn}
 \date{\today}
 \begin{document}
 \maketitle
@@ -44,7 +45,17 @@ eingesehen werden.
 %TODO csv wird noch nicht richtig gelesen, falsche formatierung?
 %Tests mit manuell angepasster csv haben geklappt... o.O
 \begin{axis}
-\addplot[black, mark=x] table [x=np, y=n, col sep=tab] {../rectangle/measures/processorScaling/10000/measure.csv};
+[            axis x line=middle,
+            axis y line=middle,
+            enlarge y limits=true,
+            width=15cm, height=8cm,     % size of the image
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=hosts,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure.csv};
 \legend{Messwerte}
 \end{axis}
 \end{tikzpicture}
