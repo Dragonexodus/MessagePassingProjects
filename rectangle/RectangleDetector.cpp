@@ -81,10 +81,10 @@ pair<int, RectangleValidator> RectangleDetector::search(short *matrix, int n, in
 
 /**
  *
- * @return a matrix with found values, if nothing found an empty matrix is returned
+ * @return a matrix with found values, if nothing found an empty matrix is returned, on error -1 or -2 is as n returned
  */
 const pair<short *, int> RectangleDetector::readFile(const char *term) {
-    pair<short *, int> nothing = make_pair(new short[0], -1);
+    pair<short *, int> nothing = make_pair(new short[0], -2);
     ifstream configFile(term);
     if (configFile.is_open()) {
         string line;

@@ -4,11 +4,8 @@
 
 static const int RETURN_COUNT = 5;
 static const int INVALID_VALUE = -1;
+static const int MASTER = 0;
 using namespace std;
-
-enum PROCESS {
-    MASTER
-};
 
 void printFromMaster(int rank, string message, ostream &outputStream);
 
@@ -40,7 +37,6 @@ int main(int argc, char **argv) {
 
     short *matrix = NULL;
     int n = 0;
-    bool readValid;
 
     if (rank == MASTER) {
         std::string configFile = "config";
@@ -50,7 +46,6 @@ int main(int argc, char **argv) {
         }
         pair<short *, int> result = detector.readFile(configFile.c_str());
         if (result.second != INVALID_VALUE) {
-            readValid = true;
             n = result.second;
             matrix = result.first;
             if (n % p != 0) {
@@ -59,24 +54,29 @@ int main(int argc, char **argv) {
         }
     }
 
-    MPI_Bcast(&readValid, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
-    if (!readValid) {
-        printFromMaster(rank, "Konnte config-File nicht lesen.", cerr);
+    MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    if (n < 0) {
+        if (n == -1) {
+            printFromMaster(rank, "Anzahl der Zeilen nicht teilbar durch die Prozessor-Anzahl!", cerr);
+        } else if (n == -2) {
+            printFromMaster(rank, "Konnte config-File nicht lesen.", cerr);
+        }
+        if (matrix != NULL) {
+            delete matrix;
+        }
         MPI_Finalize();
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     }
 
-    MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    if (n == -1) {
-        printFromMaster(rank, "Anzahl der Zeilen nicht teilbar durch die Prozessor-Anzahl!", cerr);
-        MPI_Finalize();
-        return EXIT_SUCCESS;
-    }
     if (p == 1) {
         const pair<int, RectangleValidator> &detectorResult = detector.search(matrix, n, n);
         detector.printResult(detectorResult.first);
         if (detectorResult.first == detector.RECT_FOUND) {
             //cout << detectorResult.second << endl;
+        }
+        if (matrix != NULL) {
+            delete matrix;
         }
     } else {
         parallelSearch(p, rank, detector, matrix, n);
