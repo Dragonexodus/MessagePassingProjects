@@ -46,6 +46,8 @@ private:
     vector<string> lines;
 
     short *matrix;
+
+    void matrixError(string message);
 };
 
 

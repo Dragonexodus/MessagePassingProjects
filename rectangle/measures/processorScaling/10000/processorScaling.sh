@@ -54,9 +54,9 @@ mpirun -np 2 -hostfile ../hostfiles/2 rectanglePatternDetection $pathToConfig/2
 mpirun -np 2 -hostfile ../hostfiles/2 rectanglePatternDetection $pathToConfig/1
 mpirun -np 2 -hostfile ../hostfiles/2 rectanglePatternDetection $pathToConfig/0
 
-mpirun -np 1 -hostfile ../hostfiles/1 rectanglePatternDetection $pathToConfig/2
-mpirun -np 1 -hostfile ../hostfiles/1 rectanglePatternDetection $pathToConfig/1
-mpirun -np 1 -hostfile ../hostfiles/1 rectanglePatternDetection $pathToConfig/0
+mpirun -np 1 rectanglePatternDetection $pathToConfig/2
+mpirun -np 1 rectanglePatternDetection $pathToConfig/1
+mpirun -np 1 rectanglePatternDetection $pathToConfig/0
 
 # mpirun -np 2 -hostfile hosts rectanglePatternDetection 1
 # mpirun -np 2 -hostfile hosts rectanglePatternDetection 0
