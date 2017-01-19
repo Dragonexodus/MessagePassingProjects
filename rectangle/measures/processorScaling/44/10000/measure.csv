@@ -1,4 +1,4 @@
-n   np  hosts   result  T_1(n)_in_s T_2(n)_in_s T_3(n)_in_s optional_positions
+n   np  hosts   result  T1 T2 T3 optional_positions
 10000   2   22  2   0.425387    0.427667    0.432321    ""
 10000   2   22  1   0.584859    0.584485    0.583885    ""
 10000   2   22  0   0.422362    0.423535    0.421851    "3997 3997 3999 3999"
