@@ -41,19 +41,10 @@ eingesehen werden.
 %200580	10.0075516954
 
 \begin{tikzpicture}
-\begin{axis}[
-            axis x line=middle,
-            axis y line=middle,
-            enlarge y limits=true,
-            width=15cm, height=8cm,     % size of the image
-            grid = major,
-            grid style={dashed, gray!30},
-            ylabel=T-Wert,
-            xlabel=Anzahl,
-            legend style={at={(0.1,-0.1)}, anchor=north}
-]
-%TODO
-%\addplot[black, mark=x] table [x=Anzahl, y=T-Wert, col sep=tab] {Messdaten.csv};
+%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
+%Tests mit manuell angepasster csv haben geklappt... o.O
+\begin{axis}
+\addplot[black, mark=x] table [x=np, y=n, col sep=tab] {../rectangle/measures/processorScaling/10000/measure.csv};
 \legend{Messwerte}
 \end{axis}
 \end{tikzpicture}

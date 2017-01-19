@@ -38,9 +38,7 @@ Würde integration/A2star.f löschen
 Würde rectangle/CMakeLists.txt löschen
 Würde rectangle/Debug/ löschen
 Würde rectangle/main.cpp löschen
-/cmake-build-debug/
-/copyFiles.sh
-/documentation/build/
+/cmake-build-*/
+/documentation/build/*
 /documentation/Bericht.pdf
-/documentation/Bericht.tex.bak
-/documentation/Messdaten.csv
+*.bak
