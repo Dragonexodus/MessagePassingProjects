@@ -85,11 +85,11 @@ c      Löse erstellte Topologie wieder auf
                      endif        
               elseif(i.eq.2)then
                      read(cArg,*) n
-                     if(n.gt.20.or.n.lt.1)then
+                     if(n.gt.20.or.n.lt.2)then
                             if(id.eq.0) then
                                    print*,"error-input of n:",n
                             endif
-                            n=20
+                            n=15
                      endif
               endif
        end do

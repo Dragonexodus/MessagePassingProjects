@@ -1,13 +1,9 @@
 \input{Header}	
-
-\usepackage{pgfplots}
-
-\usepackage{filecontents}
 					
 \title{Dokumentation zu den Projektaufgaben 1 und 2}
-\subtitle{Message Passing Programmierung\vspace{1cm}}
+\subtitle{Message Passing Programmierung}
 
-\author{M. Zober, M. Horn}
+\author{Matthias Zober und Michael Horn}
 \date{\today}
 \begin{document}
 \maketitle
@@ -120,27 +116,135 @@ eingesehen werden.
 \end{tikzpicture}
 \subsection{Fazit}
 
+\pagebreak
+
 \section{Projektaufgabe 2: Numerische Integration mittels Parabelformel}
-%Pseudocode? Verwendung (config), argumente,...
-%Einschränkung (gerade Prozessoranzahl etc)
-%Vll. Scatter und Gather nochmal erklären
-Als Topologie für diese Projekt wurde sich dafür entschieden die Stern-Topologie zu verwenden.
+\lstset{language=Fortran,frame=none, keepspaces=false, basicstyle=\footnotesize,showstringspaces=false}  
 
+\subsection{Verwendung}
+Der Quellcode kann mit Hilfe folgendes Aufrufes auf dem MC-3-System kompiliert werden:
+\begin{itemize}
+	\item f77.px -o A2star.px A2star.f
+\end{itemize}
+Mit folgendem Befehl wird das Programm ausgeführt:
+\begin{itemize}
+	\item run -f0 4 2 A2star.px \textbf{funktion} \textbf{n}
+\end{itemize}
 
-% Topologie, 
-% Unterschiede Genauigkeit der Funktionen mit Begründung
-% Kommunikationsoverhead?
+Für das Programm können Kommandozeilenargumente zur Auswahl der Testfunktion und die Größe der zu berechnenden Teilstücke des Integrals angegeben werden.
+\paragraph{funktion:}
+Das Programmargument \textbf{funktion} entscheidet darüber, welche der beiden gegebenen Testfunktionen verwendet wird.
+Als gültige Eingabe wird 1 für Funktion 1 und 2 für Funktion 2 erwartet.
+\paragraph{n:}
+Das zweite Programmargument \textbf{n} gibt die 2er Potenz der zu berechnenden Teilstücke des Integrals an.
+Je größer das \textbf{n}, umso genauer wird das berechnete PI.
+De höchstmöglichste zulässige Eingabe ist 20, das sind 1048576 zu berechnende Teilstücke.
+Diese Vorgehensweise soll zum Einen sicher stellen, dass \textbf{n} stets durch 2 Teilbar ist und zum Anderen das Laufzeitmessen vereinfachen, da ein exponentielles Wachstum vorliegt.
+Sollte kein Programmargument angeben werden, so wird intern die Funktion 1 mit $n = 2^{15} = 32768$ verwendet.
+
+Weiterhin wird eine ungerade Prozessorzahl ausgeschlossen, damit stets gewährleistet ist, dass die zu berechnende Anzahl an Teilstücke pro Prozessor eine ganzzahlige Zahl ist.
+
 \subsection{Realisierung}
-% Geringer Kommunikationsoverhead
-% Nur Recv., da jeder Prozessor sich seinen teilbereich selbst ausrechnen kann
 
+Grundlegend wurde sich bei der Realisierung für eine Stern-Topologie entschieden.
+Gewählt wurde diese Topologie, da bei der Parallelisierung dieser Aufgabe ein Master existert, welche alle Teilergebnisse empfängt und summiert.
+Weiterhin wurde diese Topologie bereits in einem Seminar implementiert.
+Wie die Topologie erstellt wird zeigt \autoref{ref:top}.
+
+\begin{lstlisting}[caption=Erzeugen der Stern-Topologie\label{ref:top}]
+	if(id.eq.0) then
+		do i=1,(np-1)
+			links(i)=addnewlink(topid,i,1)
+		enddo
+	else
+		link=addnewlink(topid,0,1)
+	endif
+\end{lstlisting}
+
+Da beim Starten des Programms alle Prozessoren \textbf{n} sowie die Testfunktion bereits kennen, aufgrund der Realisierung als Kommandozeilenparameter, entfällt der Kommunikationsoverhead für das Verteilen von \textbf{n} sowie das Übermitteln der Information, welche Funktion verwendet wird.
+
+Die Prozessoren können explizit ihre eigenen Bereich für die Teilstücke bestimmen und somit die numerische Berechnung durchführen.
+Nach Abschluss der Berechnung ihres Ergebnisses, werden diese an den Master-Prozessor gesendet.
+Der Master-Prozessor addiert die Ergebnisse der anderen Prozessoren zu seinem eigenem Ergebnis auf und wendet die Multiplikation h/3 auf das Gesamtergebnis an.
+Im Anschluss werden die Ergebnisse wie Referenzwert-PI, Berechnetes-PI, Abweichung und Laufzeit (nicht im Listng dargestellt) ausgegeben. 
+Das folgende \autoref{ref:main} zeigt dies.
+
+\begin{lstlisting}[caption=Empfangen und Auswerten\label{ref:main}]
+c	starte die Integration
+	call startIntegration(f,n,integral,h)
+	if(id.eq.0) then
+		print*,"use f:",f," with n:",n
+c  	Integralteilstück vom Master
+		summe = integral
+		do i=1,(np-1)
+c 	Empfange alle Teilstücke und addiere Sie
+			call recv(topid,links(i),integral,8)
+			summe = summe + integral
+		enddo
+		summe = h/3 *summe
+		derivation =  PI() - summe
+		print*,"--------------------------"
+		print*,"PI Referece:",PI()                   
+		print*,"PI Integral:",summe
+		print*,"PI Derivat.:",derivation
+	else
+c	Sende Integralteilstücke zum Master
+		call send(topid, link,integral,8)
+	endif
+\end{lstlisting}
+
+Die numerische Berechnung des Integrals wird durch jeden Prozessor ausgeführt, aber jeder Prozessor führt nur einen Teil der kompletten Berechnung aus.
+Die eigentliche Berechnung ist in dem \autoref{ref:intervall} zu sehen.
+Zunächst berechnet jeder Prozessor die Anzahl der durchzuführenden Berechnungen, als lokales \textbf{n} (\textbf{nL}).
+Im Anschluss werden Startpunkt (\textbf{aL}) und Endpunkt (\textbf{bL}) ermittelt.
+Die Funktionswerte von \textbf{aL} und \textbf{bL} der Testfunktion werden addiert und in einer Summe gespeichert.
+Im Anschluss werden die Zwischenstücke mit entsprechendem Faktor berechnet und ebenfalls summiert.
+Die Variable \textbf{h} gibt dabei die allgemeine Schrittweite an und \textbf{step} die derzeitigen Schrittwert.
+
+Nach erfolgter Berechnung sendet jeder Prozessor sein Ergebnis an den Master (falls der Prozessor nicht selbst der Master ist)
+
+\begin{lstlisting}[caption=Berechnen der relevanten Bereiche für jeden Prozessor\label{ref:intervall}]
+	id = myprocid() 
+	nL = n / nprocs()
+	aL = a + id * nL * h
+	bL = aL + nL * h
+c	Randwerte, getVal liefert Funktionswert der Testfunktion
+	summe = getVal(f,aL) + getVal(f,bL)   
+	step = aL + h
+c 	Berechnung zwischenstücke, factor alterniert mit 2 und 4
+	do i=1,nL-1
+		exponent = mod(i,2) + 1
+		factor=2**exponent
+		summe = summe + dble(getVal(f,step) * factor)
+		step = step + h    
+	enddo
+\end{lstlisting}
+
+\subsection{Ergebnisse}
+%TODO Tabellen
+
+\subsubsection{Testfunktionen}
+
+Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere PI-Werte als Funktion 1.
+Ein Grund dafür das Testfunktion 1 schlechtere Ergebnisse als Funktion 2 liefert, könnte damit zusammenhängen, dass für die Funktion 1 die Oberegrenze PI selbst ist.
+%TODO Unterschiede Genauigkeit der Funktionen mit Begründung
 
 %Speed-Up , Effizienz
-\subsection{Laufzeitverhalten}
-\subsubsection{Festes n}
-\subsection{Festes p}
+\subsubsection{Laufzeitverhalten}
+\paragraph{Festes n}
+\paragraph{Festes p}
 
 \subsection{Fazit}
+Kommunikationsoverhead spielt hier eine untergeordnete Rolle, da Minimum an Kommunikation zur Berechnung notwendig ist.
+%TODO
+Weiterhin lohnt sich die Parallelisierung,..
 
+
+%\appendix
+%\section{Quellcode Aufgabe 1}
+%
+%\section{Quellcode Aufgabe 2}
+%\lstset{language=Fortran,numbers=left, keepspaces=false, basicstyle=\footnotesize,showstringspaces=false} 
+%\lstinputlisting[]{../integration/A2star.f}
 
 \end{document}
