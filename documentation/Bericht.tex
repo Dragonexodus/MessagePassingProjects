@@ -27,16 +27,16 @@ Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequ
 Die sequentielle Erkennung ist der Teil des Programms der sich nicht parallelisieren lässt. Für die Parallelisierung muss jeder Prozessor diese Erkennung auf sein Teilbild anwenden.
 
 Im wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten und zuletzt gefundenen Pixels, die Länge der oberen gefunden Rechteckkante und die Information ob eine Zeile mit schwarze Pixeln von weißen Zeilen umschlossen wurde. Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
-TODO: Grafik hier einfügen
+\includegraphics[scale=0.8]{mismatches.png}
 
-Werden diese Muster nicht erkannt, aber schwarze Pixel erkannt, dann existiert ein Rechteck. Andernfalls werden nicht zuzuordnende schwarze Pixel (\texttt{Mismatch}) oder gar keine schwarzen Pixel (\texttt{Nothing}) im Bild gefunden.
+Werden diese Muster nicht erkannt, aber schwarze Pixel erkannt, dann existiert ein Rechteck (\texttt{FoundOne}). Andernfalls werden nicht zuzuordnende schwarze Pixel (\texttt{Mismatch}) oder gar keine schwarzen Pixel (\texttt{Nothing}) im Bild gefunden.
 
 Nachdem jeder Prozess sein Teilbild bearbeitet hat muss ein ausgezeichneter Hauptprozess (\texttt{Master}) alle Ergebnisse zusammenfassen, dies geschieht in folgenden Schritten.
 
 \begin{enumerate}
 	\item Gibt es ein Teilbild mit schwarzen Pixeln, welche aber kein Rechteck bilden, dann kann direkt abgebrochen werden mit: \texttt{Mismatch}.
 	\item Wenn alle Teilbilder \texttt{Nothing} finden, dann kann auch abgebrochen werden mit \texttt{Nothing}.
-	\item Gibt es nur ein Rechteck (\texttt{FoundOne}) und sonst \texttt{Nothing}, kann das Rechteck ausgegeben werden.
+	\item Gibt es nur ein \texttt{FoundOne} und sonst \texttt{Nothing}, kann das Rechteck ausgegeben werden.
 \end{enumerate}
 
 Falls mehrere \texttt{FoundOne} vorliegen und vorher nicht abgebrochen wurde muss der \texttt{Master} überprüfen ob die gefundenen Rechtecke zusammenhängend sind, dies kann durch folgende Kriterien überprüft werden.
