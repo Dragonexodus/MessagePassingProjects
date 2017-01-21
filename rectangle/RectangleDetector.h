@@ -1,6 +1,7 @@
 
 #ifndef PROJECT_RECTANGLEDETECTOR_H
 #define PROJECT_RECTANGLEDETECTOR_H
+#define FILE_OPENING_FAILED -2
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +31,6 @@ public:
     };
 
     void printOldMatrix(short *array, int n, int m);
-    void printOldMatrix(int *array, int n, int m);
 
     void printResult(int res);
 };

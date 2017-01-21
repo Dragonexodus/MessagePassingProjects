@@ -9,18 +9,18 @@ int RectangleDetector::testConfigs(const char *term) {
     pair<int, RectangleValidator> searchResult = search(matrix, n, n);
     printResult(searchResult.first);
     if (searchResult.first == RECT_FOUND) {
-        //cout << searchResult.second << endl;
+        cout << searchResult.second << endl;
     }
     return searchResult.first;
 }
 
 void RectangleDetector::printResult(int res) {
     if (res == MISMATCH_FOUND) {
-        //cout << "Found some black fields, but no black rectangle!" << endl << endl;;
+        cout << "Found some black fields, but no black rectangle!" << endl << endl;;
     } else if (res == NO_RECT) {
-        //cout << "No black fields found!" << endl << endl;
+        cout << "No black fields found!" << endl << endl;
     } else {
-        //cout << "rectangle found: " << endl;
+        cout << "rectangle found: " << endl;
     }
 }
 
@@ -84,7 +84,7 @@ pair<int, RectangleValidator> RectangleDetector::search(short *matrix, int n, in
  * @return a matrix with found values, if nothing found an empty matrix is returned, on error -1 or -2 is as n returned
  */
 const pair<short *, int> RectangleDetector::readFile(const char *term) {
-    pair<short *, int> nothing = make_pair(new short[0], -2);
+    pair<short *, int> nothing = make_pair(new short[0], FILE_OPENING_FAILED);
     ifstream configFile(term);
     if (configFile.is_open()) {
         string line;
@@ -116,21 +116,11 @@ const pair<short *, int> RectangleDetector::readFile(const char *term) {
 void RectangleDetector::printOldMatrix(short *array, int n, int m) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; ++j) {
-            //cout << array[i * m + j] << " ";
+            cout << array[i * m + j] << " ";
         }
-        //cout << endl;
+        cout << endl;
     }
-    //cout << endl;
-}
-
-void RectangleDetector::printOldMatrix(int *array, int n, int m) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; ++j) {
-            //cout << array[i * m + j] << " ";
-        }
-        //cout << endl;
-    }
-    //cout << endl;
+    cout << endl;
 }
 
 RectangleDetector::RectangleDetector() {}

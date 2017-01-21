@@ -1,23 +1,4 @@
-#include <iostream>
-#include "RectangleDetector.h"
-#include <mpi.h>
-
-static const int RETURN_COUNT = 5;
-static const int INVALID_VALUE = -1;
-static const int MASTER = 0;
-using namespace std;
-
-void printFromMaster(int rank, string message, ostream &outputStream);
-
-void printFromMaster(int rank, double message, ostream &outputStream);
-
-void parallelSearch(int p, int rank, RectangleDetector &detector, const short *matrix, int n);
-
-void summarize(int p, int rank, RectangleDetector &detector, RectangleValidator &validator, const int *mainResult);
-
-int summarizeRes(int p, const RectangleDetector &detector, const int *mainResult, vector<int> &members);
-
-int checkPositions(const RectangleDetector &detector, const int *mainResult, vector<int> &members, int res);
+#include "main.h"
 
 int main(int argc, char **argv) {
     int p;
@@ -45,21 +26,20 @@ int main(int argc, char **argv) {
             configFile = argv[1];
         }
         pair<short *, int> result = detector.readFile(configFile.c_str());
-        if (result.second <= INVALID_VALUE) {
-            n = result.second;
-            matrix = result.first;
-            if (n % p != 0) {
-                n = -1;
-            }
+        matrix = result.first;
+        n = result.second;
+
+        if (n % p != 0) {
+            n = INVALID_VALUE;
         }
     }
 
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     if (n < 0) {
-        if (n == -1) {
+        if (n == INVALID_VALUE) {
             printFromMaster(rank, "Anzahl der Zeilen nicht teilbar durch die Prozessor-Anzahl!", cerr);
-        } else if (n == -2) {
+        } else if (n == FILE_OPENING_FAILED) {
             printFromMaster(rank, "Konnte config-File nicht lesen.", cerr);
         }
         if (matrix != NULL) {
@@ -69,11 +49,11 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    if (p == 1) {
+    if (p == RUNNING_SEQUENTIELL) {
         const pair<int, RectangleValidator> &detectorResult = detector.search(matrix, n, n);
         detector.printResult(detectorResult.first);
         if (detectorResult.first == detector.RECT_FOUND) {
-            //cout << detectorResult.second << endl;
+            cout << detectorResult.second << endl;
         }
         if (matrix != NULL) {
             delete matrix;
@@ -100,6 +80,8 @@ void parallelSearch(int p, int rank, RectangleDetector &detector, const short *m
     }
     const pair<int, RectangleValidator> &detectorResult = detector.search(localMatrix, n, localN);
     RectangleValidator validator = detectorResult.second;
+
+    //detector.printOldMatrix(localMatrix,localN,n);
 
     int *localResult = new int[RETURN_COUNT];
     localResult[0] = detectorResult.first;
@@ -128,7 +110,7 @@ void summarize(int p, int rank, RectangleDetector &detector, RectangleValidator 
                                          mainResult[3 + processesWithRect.front() * RETURN_COUNT]));
             validator.setStop(make_pair(mainResult[2 + processesWithRect.back() * RETURN_COUNT],
                                         mainResult[4 + processesWithRect.back() * RETURN_COUNT]));
-            //cout << validator << endl << endl;
+            cout << validator << endl << endl;
         }
     }
 }
@@ -177,7 +159,7 @@ int checkPositions(const RectangleDetector &detector, const int *mainResult, vec
                 endX = stopX;
             } else {
                 if (endX != stopX || beginX != startX || endY != startY - 1) {
-                    //cout << "closedRect" << endl;
+                    cout << "closedRect" << endl;
                     res = detector.MISMATCH_FOUND;
                     break;
                 }

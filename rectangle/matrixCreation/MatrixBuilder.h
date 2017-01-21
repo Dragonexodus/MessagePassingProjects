@@ -19,17 +19,7 @@ public:
 
     ~MatrixBuilder();
 
-    const short *getMatrix();
-
-    int getMode() const;
-
-    void setMode(int mode);
-
     int getN() const;
-
-    const vector<string> &getLines() const;
-
-    void setLines(const vector<string> &lines);
 
     short *constructMatrix();
 

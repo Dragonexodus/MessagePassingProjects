@@ -73,26 +73,6 @@ void MatrixBuilder::fillBackground(const int n, const int background) {
     }
 }
 
-const short *MatrixBuilder::getMatrix() {
-    return matrix;
-}
-
-int MatrixBuilder::getMode() const {
-    return mode;
-}
-
-void MatrixBuilder::setMode(int mode) {
-    MatrixBuilder::mode = mode;
-}
-
-const vector<string> &MatrixBuilder::getLines() const {
-    return lines;
-}
-
-void MatrixBuilder::setLines(const vector<string> &lines) {
-    MatrixBuilder::lines = lines;
-}
-
 int MatrixBuilder::getN() const {
     return n;
 }
