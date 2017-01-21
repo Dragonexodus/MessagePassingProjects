@@ -17,7 +17,7 @@ Der entstandene Quellcode kann unter:\\
 \url{https://github.com/MZober1993/MessagePassingProjects}\footnote{Letzter Aufruf: \today}
 eingesehen werden.
 \section{Projektaufgabe 1: Rechteckmustererkennung}
-Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung über ein Network of Workstations realisieren.
+Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung über ein Cluster realisieren.
 \subsection{Realisierung}
 %Pseudocode? Verwendung (config), argumente,...
 %Einschränkung (gerade Prozessoranzahl etc)
@@ -54,7 +54,7 @@ Durch die Betrachtung der Umsetztung stellt man fest, dass für den Algorithmus 
 
 \subsection{Verwendung}
 \subsubsection{Ausführung}
-Der Quellcode kann mit Hilfe des folgenden Aufrufs auf dem PC oder dem Network of Workstations kompiliert werden:
+Der Quellcode kann mit Hilfe des folgenden Aufrufs auf dem PC oder dem Cluster kompiliert werden:
 
 \begin{itemize}
 	\item \texttt{cmake CMakeLists.txt -DCMAKE\_BUILD\_TYPE=RELEASE \&\& make}
@@ -63,7 +63,7 @@ Der Quellcode kann mit Hilfe des folgenden Aufrufs auf dem PC oder dem Network o
 Mif folgenden Befehl wird das Programm auf 4 Prozessoren ausgeführt:
 
 \begin{itemize}
-	\item \texttt{-npernode 4 /rectangle/RELEASE rectanglePatternDetection} \textbf{FILE}
+	\item \texttt{mpirun -npernode 4 rectanglePatternDetection} \textbf{FILE}
 \end{itemize}
 
 Für das Programm können Kommandozeilenargumente zur Angabe des Konfigurationsfiles zur Erstellung des zu untersuchenden Digitalbildes angegeben werden.
@@ -85,8 +85,6 @@ TODO: beschreibe die Erzeugung von Rechtecken mittels Mode 0 und die Erzeugung v
 
 \subsubsection{Festes n}
 \begin{tikzpicture}
-%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
-%Tests mit manuell angepasster csv haben geklappt... o.O
 \begin{axis}
 [            axis x line=middle,
             axis y line=middle,
@@ -106,8 +104,6 @@ TODO: beschreibe die Erzeugung von Rechtecken mittels Mode 0 und die Erzeugung v
 \end{tikzpicture}
 
 \begin{tikzpicture}
-%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
-%Tests mit manuell angepasster csv haben geklappt... o.O
 \begin{axis}
 [            axis x line=middle,
             axis y line=middle,
@@ -127,8 +123,6 @@ TODO: beschreibe die Erzeugung von Rechtecken mittels Mode 0 und die Erzeugung v
 \end{tikzpicture}
 \subsubsection{Festes p}
 \begin{tikzpicture}
-%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
-%Tests mit manuell angepasster csv haben geklappt... o.O
 \begin{axis}
 [            axis x line=middle,
             axis y line=middle,
@@ -148,8 +142,6 @@ TODO: beschreibe die Erzeugung von Rechtecken mittels Mode 0 und die Erzeugung v
 \end{tikzpicture}
 
 \begin{tikzpicture}
-%TODO csv wird noch nicht richtig gelesen, falsche formatierung?
-%Tests mit manuell angepasster csv haben geklappt... o.O
 \begin{axis}
 [            axis x line=middle,
             axis y line=middle,
@@ -173,8 +165,14 @@ TODO: beschreibe die Erzeugung von Rechtecken mittels Mode 0 und die Erzeugung v
 
 \section{Projektaufgabe 2: Numerische Integration mittels Parabelformel}
 \lstset{language=Fortran,frame=none, keepspaces=false, basicstyle=\footnotesize,showstringspaces=false}  
+In diesem Abschnitt wird auf die Projektaufgabe 2 eingegangen.
+Zunächst wird im \autoref{ref:verwendung} kurz erklärt wie das Programm kompiliert und gestartet wird sowie auf die Kommandozeilenargumente eingegangen. 
+Im Anschluss wird die Realisierung und damit die Lösung des Problems im \autoref{ref:realisierung} betrachtet.
+Anschließend erfolgt im \autoref{ref:ergebnisse} die Auswertung der Realisierung.
+Im letzten \autoref{ref:fazit} wird ein Fazit zu der Aufgabe gezogen. 
 
 \subsection{Verwendung}
+\label{ref:verwendung}
 Der Quellcode kann mit Hilfe folgendes Aufrufes auf dem MC-3-System kompiliert werden:
 \begin{itemize}
 	\item f77.px -o A2star.px A2star.f
@@ -198,7 +196,7 @@ Sollte kein Programmargument angeben werden, so wird intern die Funktion 1 mit $
 Weiterhin wird eine ungerade Prozessorzahl ausgeschlossen, damit stets gewährleistet ist, dass die zu berechnende Anzahl an Teilstücke pro Prozessor eine ganzzahlige Zahl ist.
 
 \subsection{Realisierung}
-
+\label{ref:realisierung}
 Grundlegend wurde sich bei der Realisierung für eine Stern-Topologie entschieden.
 Gewählt wurde diese Topologie, da bei der Parallelisierung dieser Aufgabe ein Master existert, welche alle Teilergebnisse empfängt und summiert.
 Weiterhin wurde diese Topologie bereits in einem Seminar implementiert.
@@ -214,11 +212,12 @@ Wie die Topologie erstellt wird zeigt \autoref{ref:top}.
 	endif
 \end{lstlisting}
 
-Da beim Starten des Programms alle Prozessoren \textbf{n} sowie die Testfunktion bereits kennen, aufgrund der Realisierung als Kommandozeilenparameter, entfällt der Kommunikationsoverhead für das Verteilen von \textbf{n} sowie das Übermitteln der Information, welche Funktion verwendet wird.
+Bedingt durch die Realisierung als Kommandozeilenparameter, entfällt der Kommunikationsoverhead für das Verteilen von \textbf{n} und \textbf{funktion}.
+Daher kennen alle Prozessoren \textbf{n} sowie die Testfunktion beim Programmstart.
 
 Die Prozessoren können explizit ihre eigenen Bereich für die Teilstücke bestimmen und somit die numerische Berechnung durchführen.
-Nach Abschluss der Berechnung ihres Ergebnisses, werden diese an den Master-Prozessor gesendet.
-Der Master-Prozessor addiert die Ergebnisse der anderen Prozessoren zu seinem eigenem Ergebnis auf und wendet die Multiplikation h/3 auf das Gesamtergebnis an.
+Nach Abschluss der Berechnungen, werden diese an den Master-Prozessor gesendet.
+Der Master-Prozessor summiert die Ergebnisse der anderen Prozessoren zu seinem eigenem Ergebnis auf und wendet die Multiplikation h/3 auf das Gesamtergebnis an.
 Im Anschluss werden die Ergebnisse wie Referenzwert-PI, Berechnetes-PI, Abweichung und Laufzeit (nicht im Listng dargestellt) ausgegeben. 
 Das folgende \autoref{ref:main} zeigt dies.
 
@@ -274,6 +273,7 @@ c 	Berechnung zwischenstücke, factor alterniert mit 2 und 4
 \end{lstlisting}
 
 \subsection{Ergebnisse}
+\label{ref:ergebnisse}
 %TODO Tabellen
 
 \subsubsection{Testfunktionen}
@@ -288,6 +288,7 @@ Ein Grund dafür das Testfunktion 1 schlechtere Ergebnisse als Funktion 2 liefer
 \paragraph{Festes p}
 
 \subsection{Fazit}
+\label{ref:fazit}
 Kommunikationsoverhead spielt hier eine untergeordnete Rolle, da Minimum an Kommunikation zur Berechnung notwendig ist.
 %TODO
 Weiterhin lohnt sich die Parallelisierung,..
