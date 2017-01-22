@@ -12,14 +12,13 @@
        id = myprocid()
        np = nprocs()
 
-c      Beschränkung auf eine gerade Prozessoranzahl!
-c      (nL sollte ganzzahlig sein)
-       if(np.eq.1.or.mod(np,2).eq.0)then
-c
-       topid=newtop(np-1)
-
        call readCL(f,n)
        n = 2**n
+
+c      (nL sollte ganzzahlig sein)
+       if(np.eq.1.or.mod(n,np).eq.0)then
+c
+       topid=newtop(np-1)
 
 c      initalisierie Stern-Topologie
        if(id.eq.0) then
