@@ -39,7 +39,6 @@ Würde rectangle/CMakeLists.txt löschen
 Würde rectangle/Debug/ löschen
 Würde rectangle/main.cpp löschen
 /cmake-build-*/
-/documentation/build/*
 /documentation/Bericht.pdf
 *.bak
-/documentation/Messdaten.csv
+/documentation/build/
