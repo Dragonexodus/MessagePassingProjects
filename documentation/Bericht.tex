@@ -171,12 +171,11 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Cas
 \pagebreak
 
 \section{Projektaufgabe 2: Numerische Integration mittels Parabelformel}
-\lstset{language=Fortran,frame=none, keepspaces=false, basicstyle=\footnotesize,showstringspaces=false}  
+\lstset{language=Fortran,frame=none, keepspaces=false, basicstyle=\scriptsize,showstringspaces=false}  
 In diesem Abschnitt wird auf die Projektaufgabe 2 eingegangen.
-Zunächst wird im \autoref{ref:verwendung} kurz erklärt wie das Programm kompiliert und gestartet wird sowie auf die Kommandozeilenargumente eingegangen.
-Im Anschluss wird die Realisierung und damit die Lösung des Problems im \autoref{ref:realisierung} betrachtet.
-Anschließend erfolgt im \autoref{ref:ergebnisse} die Auswertung der Realisierung.
-Im letzten \autoref{ref:fazit} wird ein Fazit zu der Aufgabe gezogen.
+Zunächst wird kurz erklärt wie das Programm kompiliert und gestartet wird sowie auf die Kommandozeilenargumente eingegangen.
+Im Anschluss wird die Realisierung und damit die Lösung des Problems betrachtet.
+Anschließend erfolgt die Auswertung und im letzten Abschnitt wird ein Fazit gezogen.
 
 \subsection{Verwendung}
 \label{ref:verwendung}
@@ -186,18 +185,18 @@ Der Quellcode kann mit Hilfe folgendes Aufrufes auf dem MC-3-System kompiliert w
 \end{itemize}
 Mit folgendem Befehl wird das Programm ausgeführt:
 \begin{itemize}
-	\item run -f0 4 2 A2star.px \textbf{funktion} \textbf{n}
+	\item run -f0 4 2 A2star.px \textbf{FUNCTION} \textbf{N}
 \end{itemize}
 
 Für das Programm können Kommandozeilenargumente zur Auswahl der Testfunktion und die Größe der zu berechnenden Teilstücke des Integrals angegeben werden.
-\paragraph{funktion:}
-Das Programmargument \textbf{funktion} entscheidet darüber, welche der beiden gegebenen Testfunktionen verwendet wird.
+\paragraph{FUNCTION:}
+Das Programmargument \textbf{FUNCTION} entscheidet darüber, welche der beiden gegebenen Testfunktionen verwendet wird.
 Als gültige Eingabe wird 1 für Funktion 1 und 2 für Funktion 2 erwartet.
-\paragraph{n:}
-Das zweite Programmargument \textbf{n} gibt die 2er Potenz der zu berechnenden Teilstücke des Integrals an.
-Je größer das \textbf{n}, umso genauer wird das berechnete PI.
+\paragraph{N:}
+Das zweite Programmargument \textbf{N} gibt die 2er Potenz der zu berechnenden Teilstücke des Integrals an.
+Je größer das \textbf{N}, umso genauer wird das berechnete PI.
 De höchstmöglichste zulässige Eingabe ist 20, das sind 1048576 zu berechnende Teilstücke.
-Diese Vorgehensweise soll zum Einen sicher stellen, dass \textbf{n} stets durch 2 Teilbar ist und zum Anderen das Laufzeitmessen vereinfachen, da ein exponentielles Wachstum vorliegt.
+Diese Vorgehensweise soll zum Einen sicher stellen, dass \textbf{N} stets durch 2 Teilbar ist und zum Anderen das Laufzeitmessen vereinfachen, da ein exponentielles Wachstum vorliegt.
 Sollte kein Programmargument angeben werden, so wird intern die Funktion 1 mit $n = 2^{15} = 32768$ verwendet.
 
 Weiterhin wird eine ungerade Prozessorzahl ausgeschlossen, damit stets gewährleistet ist, dass die zu berechnende Anzahl an Teilstücke pro Prozessor eine ganzzahlige Zahl ist.
@@ -207,17 +206,6 @@ Weiterhin wird eine ungerade Prozessorzahl ausgeschlossen, damit stets gewährle
 Grundlegend wurde sich bei der Realisierung für eine Stern-Topologie entschieden.
 Gewählt wurde diese Topologie, da bei der Parallelisierung dieser Aufgabe ein Master existert, welche alle Teilergebnisse empfängt und summiert.
 Weiterhin wurde diese Topologie bereits in einem Seminar implementiert.
-Wie die Topologie erstellt wird zeigt \autoref{ref:top}.
-
-\begin{lstlisting}[caption=Erzeugen der Stern-Topologie\label{ref:top}]
-	if(id.eq.0) then
-		do i=1,(np-1)
-			links(i)=addnewlink(topid,i,1)
-		enddo
-	else
-		link=addnewlink(topid,0,1)
-	endif
-\end{lstlisting}
 
 Bedingt durch die Realisierung als Kommandozeilenparameter, entfällt der Kommunikationsoverhead für das Verteilen von \textbf{n} und \textbf{funktion}.
 Daher kennen alle Prozessoren \textbf{n} sowie die Testfunktion beim Programmstart.
@@ -228,29 +216,20 @@ Der Master-Prozessor summiert die Ergebnisse der anderen Prozessoren zu seinem e
 Im Anschluss werden die Ergebnisse wie Referenzwert-PI, Berechnetes-PI, Abweichung und Laufzeit (nicht im Listng dargestellt) ausgegeben. 
 Das folgende \autoref{ref:main} zeigt dies.
 
+\begin{center}
 \begin{lstlisting}[caption=Empfangen und Auswerten\label{ref:main}]
-c	starte die Integration
 	call startIntegration(f,n,integral,h)
 	if(id.eq.0) then
-		print*,"use f:",f," with n:",n
-c  	Integralteilstück vom Master
 		summe = integral
 		do i=1,(np-1)
-c 	Empfange alle Teilstücke und addiere Sie
 			call recv(topid,links(i),integral,8)
-			summe = summe + integral
+			summe = summe + h/3 * integral
 		enddo
-		summe = h/3 *summe
-		derivation =  PI() - summe
-		print*,"--------------------------"
-		print*,"PI Referece:",PI()                   
-		print*,"PI Integral:",summe
-		print*,"PI Derivat.:",derivation
 	else
-c	Sende Integralteilstücke zum Master
 		call send(topid, link,integral,8)
 	endif
 \end{lstlisting}
+\end{center}
 
 Die numerische Berechnung des Integrals wird durch jeden Prozessor ausgeführt, aber jeder Prozessor führt nur einen Teil der kompletten Berechnung aus.
 Die eigentliche Berechnung ist in dem \autoref{ref:intervall} zu sehen.
@@ -258,26 +237,24 @@ Zunächst berechnet jeder Prozessor die Anzahl der durchzuführenden Berechnunge
 Im Anschluss werden Startpunkt (\textbf{aL}) und Endpunkt (\textbf{bL}) ermittelt.
 Die Funktionswerte von \textbf{aL} und \textbf{bL} der Testfunktion werden addiert und in einer Summe gespeichert.
 Im Anschluss werden die Zwischenstücke mit entsprechendem Faktor berechnet und ebenfalls summiert.
-Die Variable \textbf{h} gibt dabei die allgemeine Schrittweite an und \textbf{step} die derzeitigen Schrittwert.
+Die Variable \textbf{h} gibt dabei die allgemeine Schrittweite an und \textbf{step} den derzeitigen Schrittwert.
 
 Nach erfolgter Berechnung sendet jeder Prozessor sein Ergebnis an den Master (falls der Prozessor nicht selbst der Master ist)
 
+\begin{center}
 \begin{lstlisting}[caption=Berechnen der relevanten Bereiche für jeden Prozessor\label{ref:intervall}]
-	id = myprocid() 
 	nL = n / nprocs()
 	aL = a + id * nL * h
 	bL = aL + nL * h
-c	Randwerte, getVal liefert Funktionswert der Testfunktion
 	summe = getVal(f,aL) + getVal(f,bL)   
 	step = aL + h
-c 	Berechnung zwischenstücke, factor alterniert mit 2 und 4
 	do i=1,nL-1
-		exponent = mod(i,2) + 1
-		factor=2**exponent
+		factor=2**(mod(i,2) + 1)
 		summe = summe + dble(getVal(f,step) * factor)
 		step = step + h    
 	enddo
 \end{lstlisting}
+\end{center}
 
 \subsection{Ergebnisse}
 \label{ref:ergebnisse}
@@ -285,18 +262,18 @@ c 	Berechnung zwischenstücke, factor alterniert mit 2 und 4
 
 \subsubsection{Testfunktionen}
 
-Für die Testfunktionen wird folgender Referenzwert verwendet: 3.141592653589793.
+Für die Testfunktionen wird der Referenzwert \textbf{3.141592653589793} verwendet.
 Die \autoref{ref:piP} zeigt die Abweichung zum Referenzwert von Pi bei einer konstanten Prozessoranzahl von 8 und einem sich verändernden \textbf{n}.
 Die \autoref{ref:piN} zeigt ebenfalls die Abweichung, aber hier wird ein konstantes \textbf{n} von 32768 verwendet und die Prozessoranzahl variiert.
 
 Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere Pi-Näherungswerte als Funktion 1.
-Ein Grund dafür das Funktion 1 schlechte Näherungswerte liefert liegt unter anderem an der Oberegrenze.
+Ein Grund dafür das Funktion 1 schlechte Näherungswerte liefert liegt unter Anderem an der Oberegrenze.
 Diese Obergrenze ist Pi selbst.
 Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2, daher benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
 
-%TODO hat das was mit Arctan zu tun???
-%TODO Unterschiede Genauigkeit der Funktionen mit Begründung
+Ein weiteres Problem besteht, wenn aufgrund der Prozessoranzahl eine periodische Verteilung entsteht, dann sinkt die Genauigkeit für das angenäherte Pi wie in \autoref{ref:piN} in Zeile 2 zu sehen ist ($\frac{32768}{6} = 5461.3\bar{3}$).
 
+\begin{center}
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 	\pgfplotstabletypeset[col sep=space
@@ -320,7 +297,7 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 	\label{ref:piN}
 \end{minipage}
 \end{figure}
-
+\end{center}
 
 
 %Speed-Up , Effizienz
