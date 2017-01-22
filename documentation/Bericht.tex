@@ -26,17 +26,17 @@ Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung übe
 Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Digitalbild zu realisieren.
 Die sequentielle Erkennung ist der Teil des Programms der sich nicht parallelisieren lässt. Für die Parallelisierung muss jeder Prozessor diese Erkennung auf sein Teilbild anwenden.
 
-Im wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten und zuletzt gefundenen Pixels, die Länge der oberen gefunden Rechteckkante und die Information ob eine Zeile mit schwarze Pixeln von weißen Zeilen umschlossen wurde. Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.\newpage
-\begin{figure}[]
+Im Wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} \& \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} \& \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.\newpage
+\begin{figure}[h]
     \centering
-    \includegraphics[scale=0.8]{mismatches.png}
+    \includegraphics[scale=0.75]{mismatches.png}
     \caption{Ausschließende Bit-Muster mit Regeln}
     \label{fig:mismatches}
 \end{figure}
 
 Werden diese Muster nicht erkannt, aber schwarze Pixel, dann existiert ein Rechteck (\texttt{FoundOne}). Andernfalls werden nicht zuzuordnende schwarze Pixel (\texttt{Mismatch}) oder gar keine schwarzen Pixel (\texttt{Nothing}) im Bild gefunden.
 
-Nachdem jeder Prozess sein Teilbild bearbeitet hat muss ein ausgezeichneter Hauptprozess (\texttt{Master}) alle Ergebnisse zusammenfassen, dies geschieht in folgenden Schritten.
+Nachdem jeder Prozess sein Teilbild bearbeitet hat muss ein ausgezeichneter Hauptprozess (\texttt{Master}) alle Ergebnisse zusammenfassen, dies geschieht in den folgenden Schritten.
 
 \begin{enumerate}
 	\item Gibt es ein Teilbild mit schwarzen Pixeln, welche aber kein Rechteck bilden, dann kann direkt abgebrochen werden mit: \texttt{Mismatch}.
@@ -59,7 +59,7 @@ Durch die Betrachtung der Umsetztung stellt man fest, dass für den Algorithmus 
 
 \subsection{Verwendung}
 \subsubsection{Ausführung}
-Der Quellcode kann mit Hilfe des folgenden Aufrufs auf dem PC oder dem Cluster kompiliert werden:
+Der Quellcode kann mit Hilfe des folgenden Aufrufs kompiliert werden:
 
 \begin{itemize}
 	\item \texttt{cmake CMakeLists.txt -DCMAKE\_BUILD\_TYPE=RELEASE \&\& make}
@@ -76,10 +76,10 @@ Für das Programm können Kommandozeilenargumente zur Angabe des Konfigurationsf
 \subsubsection{Konfigurationsfile}
 Die Anwendung unterstützt drei Modi zur Erzeugung des Digitalbildes, welcher dieser Modi verwendet wird, steht immer in der ersten Zeile des Files.
 
-\paragraph{Modus 2: Custom Mode}Der \texttt{Custom Mode} ermöglicht die direkte angabe einer $n*n$ Matrix (ab Zeile zwei) aus Nullen und Einzen.
+\paragraph{Modus 2: Custom Mode}Der \texttt{Custom Mode} ermöglicht die direkte Angabe einer $n*n$ Matrix (ab Zeile zwei) aus Nullen und Einzen.
 
 \paragraph{Modus 1: Single Fields \& Modus 0: Rectangle}
-Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird. Die zweite Zeile beschreibt die größe $n$ und die dritte die zu verwendende Hintergrundfarbe (0 oder 1). Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden. \\
+Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte Angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird. Die zweite Zeile beschreibt die Größe $n$ und die Dritte die zu verwendende Hintergrundfarbe (0 oder 1). Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden. \\
 Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder welche im Bild umgedreht werden müssen. Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
 
 Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne das diese tatsächlich im Speicher existieren müssen. Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleineren $n$ Anwendung. Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
