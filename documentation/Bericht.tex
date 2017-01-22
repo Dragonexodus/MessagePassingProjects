@@ -26,10 +26,15 @@ Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung übe
 Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Digitalbild zu realisieren.
 Die sequentielle Erkennung ist der Teil des Programms der sich nicht parallelisieren lässt. Für die Parallelisierung muss jeder Prozessor diese Erkennung auf sein Teilbild anwenden.
 
-Im wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten und zuletzt gefundenen Pixels, die Länge der oberen gefunden Rechteckkante und die Information ob eine Zeile mit schwarze Pixeln von weißen Zeilen umschlossen wurde. Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
-\includegraphics[scale=0.8]{mismatches.png}
+Im wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten und zuletzt gefundenen Pixels, die Länge der oberen gefunden Rechteckkante und die Information ob eine Zeile mit schwarze Pixeln von weißen Zeilen umschlossen wurde. Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.\newpage
+\begin{figure}[]
+    \centering
+    \includegraphics[scale=0.8]{mismatches.png}
+    \caption{Ausschließende Bit-Muster mit Regeln}
+    \label{fig:mismatches}
+\end{figure}
 
-Werden diese Muster nicht erkannt, aber schwarze Pixel erkannt, dann existiert ein Rechteck (\texttt{FoundOne}). Andernfalls werden nicht zuzuordnende schwarze Pixel (\texttt{Mismatch}) oder gar keine schwarzen Pixel (\texttt{Nothing}) im Bild gefunden.
+Werden diese Muster nicht erkannt, aber schwarze Pixel, dann existiert ein Rechteck (\texttt{FoundOne}). Andernfalls werden nicht zuzuordnende schwarze Pixel (\texttt{Mismatch}) oder gar keine schwarzen Pixel (\texttt{Nothing}) im Bild gefunden.
 
 Nachdem jeder Prozess sein Teilbild bearbeitet hat muss ein ausgezeichneter Hauptprozess (\texttt{Master}) alle Ergebnisse zusammenfassen, dies geschieht in folgenden Schritten.
 
@@ -49,7 +54,7 @@ Falls mehrere \texttt{FoundOne} vorliegen und vorher nicht abgebrochen wurde mus
 
 Nach dieser letzten Überprüfung kann der Master-Prozess das Ergebnis ermitteln und die Start- \& Stopp-Koordinaten des gefundenen Rechtecks ausgeben. 
 
-Durch die Betrachtung der Umsetztung stellt man fest, dass für den Algorithmus ein Best-Case darin besteht sofort ein \texttt{Mismatch} zu finden, da direkt abgebrochen werden kann. Der Average-Case stellt ein Digitalbild ohne schwarze Pixel dar, da nach überprüfen aller Pixel abgebrochen werden kann, aber keine weiteren Überprufungen stattfinden. Der Worst-Case besteht darin mehrere Rechtecke zu finden, da alle Rechtecke zusammenhängend sein müssen. Für die Untersuchungen zur Laufzeit werden, stets diese drei Fälle berücksichtigt.
+Durch die Betrachtung der Umsetztung stellt man fest, dass für den Algorithmus ein Best-Case darin besteht sofort ein \texttt{Mismatch} zu finden, da direkt abgebrochen werden kann. Der Average-Case stellt ein Digitalbild ohne schwarze Pixel dar, da nach überprüfen aller Pixel abgebrochen werden kann, aber keine weiteren Überprufungen stattfinden. Der Worst-Case besteht darin mehrere Rechtecke zu finden, da alle Rechtecke zusammenhängend sein müssen. Für die Untersuchungen zur Laufzeit werden diese drei Fälle berücksichtigt.
 
 
 \subsection{Verwendung}
@@ -71,17 +76,19 @@ Für das Programm können Kommandozeilenargumente zur Angabe des Konfigurationsf
 \subsubsection{Konfigurationsfile}
 Die Anwendung unterstützt drei Modi zur Erzeugung des Digitalbildes, welcher dieser Modi verwendet wird, steht immer in der ersten Zeile des Files.
 
-\paragraph{Modi 2 - Custom Mode}Der \texttt{Custom Mode} ermöglicht die direkte angabe einer n*n Matrix aus Nullen und Einzen.
+\paragraph{Modus 2: Custom Mode}Der \texttt{Custom Mode} ermöglicht die direkte angabe einer $n*n$ Matrix (ab Zeile zwei) aus Nullen und Einzen.
 
-TODO: Beschreibe dass Modi 0 und 1 die Eingabe mit der Angabe von n und der Hintergrundfarbe gemeinsam verwenden 
+\paragraph{Modus 1: Single Fields \& Modus 0: Rectangle}
+Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird. Die zweite Zeile beschreibt die größe $n$ und die dritte die zu verwendende Hintergrundfarbe (0 oder 1). Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden. \\
+Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder welche im Bild umgedreht werden müssen. Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird. 
 
-TODO: beschreibe die Erzeugung von Rechtecken mittels Mode 0 und die Erzeugung von einzelnen Punkten durch Mode 1
-
+Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne das diese tatsächlich im Speicher existieren müssen. Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleineren $n$ Anwendung. Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
 %Speed-Up , Effizienz
 %Wo liegt das Maximum für das zu untersuchende quadratische Raster?
 %Kommunikationsoverhead
 \subsection{Laufzeitverhalten}
 % Auswertungsoverhead durch Master (Auswertung von Gather - parallel)
+Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Case \texttt{Mismatch} wesentlich kürzere Laufzeiten für den sequentiellen Fall, als für den parallelen. Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
 
 \subsubsection{Festes n}
 \begin{tikzpicture}
@@ -278,8 +285,9 @@ c 	Berechnung zwischenstücke, factor alterniert mit 2 und 4
 
 \subsubsection{Testfunktionen}
 
-Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere PI-Werte als Funktion 1.
-Ein Grund dafür das Testfunktion 1 schlechtere Ergebnisse als Funktion 2 liefert, könnte damit zusammenhängen, dass für die Funktion 1 die Oberegrenze PI selbst ist.
+Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere PI-Werte als Funktion 1. 
+Ein Grund dafür das Testfunktion 1 schlechtere Ergebnisse als Funktion 2 liefert, hängt damit zusammen, dass für die Funktion 1 die Integralgrenze ($b$) PI selbst ist. Somit treten größere Ungenauigkeiten als bei Funktion 2 ($b=1$) auf, da PI eine irrationale Zahl ist. Zum anderen muss für die Testfunktion 1 nur bis $1$ integriert werden, deshalb terminiert die Integration für diese Funktion wesentlich früher.
+
 %TODO Unterschiede Genauigkeit der Funktionen mit Begründung
 
 %Speed-Up , Effizienz
