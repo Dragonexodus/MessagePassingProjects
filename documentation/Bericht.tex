@@ -278,9 +278,43 @@ c 	Berechnung zwischenstücke, factor alterniert mit 2 und 4
 
 \subsubsection{Testfunktionen}
 
-Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere PI-Werte als Funktion 1.
-Ein Grund dafür das Testfunktion 1 schlechtere Ergebnisse als Funktion 2 liefert, könnte damit zusammenhängen, dass für die Funktion 1 die Oberegrenze PI selbst ist.
+Für die Testfunktionen wird folgender Referenzwert verwendet: 3.141592653589793.
+Die \autoref{ref:piP} zeigt die Abweichung zum Referenzwert von Pi bei einer konstanten Prozessoranzahl von 8 und einem sich verändernden \textbf{n}.
+Die \autoref{ref:piN} zeigt ebenfalls die Abweichung, aber hier wird ein konstantes \textbf{n} von 32768 verwendet und die Prozessoranzahl variiert.
+
+Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere Pi-Näherungswerte als Funktion 1.
+Ein Grund dafür das Funktion 1 schlechte Näherungswerte liefert liegt unter anderem an der Oberegrenze.
+Diese Obergrenze ist Pi selbst.
+Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2, daher benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
+
+%TODO hat das was mit Arctan zu tun???
 %TODO Unterschiede Genauigkeit der Funktionen mit Begründung
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+	\pgfplotstabletypeset[col sep=space
+	,every head row/.style={before row={\hline},after row=\hline}
+	,every last row/.style={after row=\hline}
+	,every even column/.style={column type/.add={|}{|}}
+	,columns={n,Abweichung-F1,Abweichung-F2}
+	]{../integration/functionDiffp8.csv} 
+	\caption{Mit 8 Prozessoren}
+	\label{ref:piP}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+	\pgfplotstabletypeset[col sep=space
+	,every head row/.style={before row={\hline},after row=\hline}
+	,every last row/.style={after row=\hline}
+	,every even column/.style={column type/.add={|}{|}}
+	,columns={p,Abweichung-F1,Abweichung-F2}
+	]{../integration/functionDiffn.csv}
+	\caption{Mit n = 32768}
+	\label{ref:piN}
+\end{minipage}
+\end{figure}
+
+
 
 %Speed-Up , Effizienz
 \subsubsection{Laufzeitverhalten}
