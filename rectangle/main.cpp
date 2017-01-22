@@ -103,7 +103,9 @@ void summarize(int p, int rank, RectangleDetector &detector, RectangleValidator 
     if (rank == MASTER) {
         vector<int> processesWithRect;
         int res = summarizeRes(p, detector, mainResult, processesWithRect);
-        res = checkPositions(detector, mainResult, processesWithRect, res);
+        if(res==detector.RECT_FOUND&&processesWithRect.size()>1){
+            res = checkPositions(detector, mainResult, processesWithRect, res);
+        }
         detector.printResult(res);
         if (res == detector.RECT_FOUND) {
             validator.setStart(make_pair(mainResult[1 + processesWithRect.front() * RETURN_COUNT],
