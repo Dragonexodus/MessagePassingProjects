@@ -91,81 +91,52 @@ Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Di
 Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Case \texttt{Mismatch} wesentlich kürzere Laufzeiten für den sequentiellen Fall, als für den parallelen. Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
 
 \subsubsection{Festes n}
+%TODO LEGENDE
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
 \begin{tikzpicture}
 \begin{axis}
-[            axis x line=middle,
-            axis y line=middle,
-            enlarge y limits=true,
-            width=15cm, height=8cm,     % size of the image
+[           
             grid = major,
             grid style={dashed, gray!30},
             ylabel=Time in s,
-            xlabel=n,
+            xlabel=p,
             legend style={at={(0.1,-0.1)}, anchor=north}
 ]
-\addplot[black, mark=x] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/88/measure0.csv};
-\addplot[blue, mark=*] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/88/measure1.csv};
-\addplot[red, mark=+] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/88/measure2.csv};
+\addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/10000/measure2.csv};
 \legend{0,1,2}
 \end{axis}
 \end{tikzpicture}
+	\caption{n = 10000}
+	\label{ref:n10000}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[           
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\legend{0,1,2}
+\end{axis}
+\end{tikzpicture}
+	\caption{n = 40000}
+	\label{ref:n40000}
+\end{minipage}
+\end{figure}
 
-\begin{tikzpicture}
-\begin{axis}
-[            axis x line=middle,
-            axis y line=middle,
-            enlarge y limits=true,
-            width=15cm, height=8cm,     % size of the image
-            grid = major,
-            grid style={dashed, gray!30},
-            ylabel=Time in s,
-            xlabel=n,
-            legend style={at={(0.1,-0.1)}, anchor=north}
-]
-\addplot[black, mark=x] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/44/measure0.csv};
-\addplot[blue, mark=*] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/44/measure1.csv};
-\addplot[red, mark=+] table [x=n, y=T2 , col sep=space] {../rectangle/measures/nScaling/44/measure2.csv};
-\legend{0,1,2}
-\end{axis}
-\end{tikzpicture}
 \subsubsection{Festes p}
-\begin{tikzpicture}
-\begin{axis}
-[            axis x line=middle,
-            axis y line=middle,
-            enlarge y limits=true,
-            width=15cm, height=8cm,     % size of the image
-            grid = major,
-            grid style={dashed, gray!30},
-            ylabel=Time in s,
-            xlabel=hosts,
-            legend style={at={(0.1,-0.1)}, anchor=north}
-]
-\addplot[black, mark=x] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
-\addplot[blue, mark=*] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
-\addplot[red, mark=+] table [x=hosts, y=T1 , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
-\legend{0,1,2}
-\end{axis}
-\end{tikzpicture}
 
-\begin{tikzpicture}
-\begin{axis}
-[           axis x line=middle,
-            axis y line=middle,
-            enlarge y limits=true,
-            width=15cm, height=8cm,     % size of the image
-            grid = major,
-            grid style={dashed, gray!30},
-            ylabel=Time in s,
-            xlabel=hosts,
-            legend style={at={(0.1,-0.1)}, anchor=north}
-]
-\addplot[black, mark=x] table [x=hosts, y=T2 , col sep=space] {../rectangle/measures/processorScaling/88/40000/measure0.csv};
-\addplot[blue, mark=*] table [x=hosts, y=T2 , col sep=space] {../rectangle/measures/processorScaling/88/40000/measure1.csv};
-\addplot[red, mark=+] table [x=hosts, y=T2 , col sep=space] {../rectangle/measures/processorScaling/88/40000/measure2.csv};
-\legend{0,1,2}
-\end{axis}
-\end{tikzpicture}
+
 \subsection{Fazit}
 
 \pagebreak
