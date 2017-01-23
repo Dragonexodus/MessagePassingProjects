@@ -150,7 +150,7 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Cas
 
 \begin{tikzpicture}
 \begin{axis}
-[            axis x line=middle,
+[           axis x line=middle,
             axis y line=middle,
             enlarge y limits=true,
             width=15cm, height=8cm,     % size of the image
@@ -171,7 +171,7 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Cas
 \pagebreak
 
 \section{Projektaufgabe 2: Numerische Integration mittels Parabelformel}
-\lstset{language=Fortran,frame=none, keepspaces=false,tabsize=1,captionpos=b, basicstyle=\scriptsize,showstringspaces=false}  
+\lstset{language=Fortran,frame=none, keepspaces=false,tabsize=1,captionpos=b, basicstyle=\scriptsize,showstringspaces=false,breaklines=true}  
 In diesem Abschnitt wird auf die Projektaufgabe 2 eingegangen.
 Zunächst wird kurz erklärt wie das Programm kompiliert und gestartet wird sowie auf die Kommandozeilenargumente eingegangen.
 Im Anschluss wird die Realisierung und damit die Lösung des Problems betrachtet.
@@ -241,7 +241,7 @@ Die \autoref{ref:main} zeigt dies.
 	step = aL + h
 	do i=1,nL-1
 		factor=2**(mod(i,2) + 1)
-		summe = summe + dble(getVal(f,step) * factor)
+		summe = summe + (dble(getVal(f,step) * factor)
 		step = step + h    
 	enddo
 \end{lstlisting}
@@ -264,7 +264,6 @@ Nach erfolgter Berechnung sendet jeder Prozessor sein Ergebnis an den Master (fa
 
 \subsection{Ergebnisse}
 \label{ref:ergebnisse}
-%TODO Tabellen
 
 \subsubsection{Testfunktionen}
 
@@ -273,7 +272,7 @@ Die \autoref{ref:piP} zeigt die Abweichung zum Referenzwert von Pi bei einer kon
 Die \autoref{ref:piN} zeigt ebenfalls die Abweichung, aber hier wird ein konstantes \textbf{n} von 32768 verwendet und die Prozessoranzahl variiert.
 
 Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere Pi-Näherungswerte als Funktion 1.
-Ein Grund dafür das die Funktion 1 schlechte Näherungswerte liefert liegt unter Anderem an der Oberegrenze.
+Ein Grund dafür, dass die Funktion 1 schlechte Näherungswerte liefert, liegt unter Anderem an der Oberegrenze.
 Diese Obergrenze ist Pi selbst.
 Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2, daher benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
 
@@ -306,8 +305,93 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 
 %Speed-Up , Effizienz
 \subsubsection{Laufzeitverhalten}
-\paragraph{Festes n}
-\paragraph{Festes p}
+\paragraph{SpeedUp und Effizienz}
+
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[ 
+           	grid = major,
+			scale = 1,
+            grid style={dashed, gray!30},
+            ylabel=SpeedUp,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=SpeedUp15 , col sep=space]{../integration/speedUpF1.csv};
+\addplot[blue, mark=+] table [x=p, y=SpeedUp12 , col sep=space]{../integration/speedUpF1.csv};
+\addplot[black] table [x=p, y=IdealSpeedUp, col sep=space]{../integration/speedUpF1.csv};
+\legend{n = 32768,n = 4096, Ideal}
+\end{axis}
+\end{tikzpicture}
+	\caption{SpeedUp Funktion 1}
+	\label{ref:speedF1}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[  			grid = major,
+			scale = 1,
+            grid style={dashed, gray!30},
+            ylabel=SpeedUp,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=SpeedUp15 , col sep=space]{../integration/speedUpF2.csv};
+\addplot[blue, mark=*] table [x=p, y=SpeedUp12 , col sep=space]{../integration/speedUpF2.csv};
+\addplot[black] table [x=p, y=IdealSpeedUp, col sep=space]{../integration/speedUpF2.csv};
+\legend{n = 32768,n = 4096,Ideal}
+\end{axis}
+\end{tikzpicture}
+	\caption{SpeedUp Funktion 2}
+	\label{ref:speedF2}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[   
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Effizienz,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=Effizienz15 , col sep=space]{../integration/speedUpF1.csv};
+\addplot[blue, mark=x] table [x=p, y=Effizienz12 , col sep=space]{../integration/speedUpF1.csv};
+\addplot[black] table [x=p, y=IdealEffizienz, col sep=space]{../integration/speedUpF1.csv};
+\legend{n = 32768,n = 4096}
+\end{axis}
+\end{tikzpicture}
+	\caption{Effizienz Funktion 1}
+	\label{ref:EffizienzF1}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[   
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Effizienz,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=Effizienz15 , col sep=space]{../integration/speedUpF2.csv};
+\addplot[blue, mark=x] table [x=p, y=Effizienz12 , col sep=space]{../integration/speedUpF2.csv};
+\addplot[black] table [x=p, y=IdealEffizienz, col sep=space]{../integration/speedUpF2.csv};
+\legend{n = 32768,n = 4096}
+\end{axis}
+\end{tikzpicture}
+	\caption{Effizienz Funktion 2}
+	\label{ref:EffizienzF2}
+\end{minipage}
+\end{figure}
 
 \subsection{Fazit}
 \label{ref:fazit}
