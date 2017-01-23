@@ -26,7 +26,7 @@ Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung übe
 Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Digitalbild zu realisieren.
 Die sequentielle Erkennung ist der Teil des Programms der sich nicht parallelisieren lässt. Für die Parallelisierung muss jeder Prozessor diese Erkennung auf sein Teilbild anwenden.
 
-Im Wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} \& \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} \& \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.\newpage
+Im Wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} \& \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} \& \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.75]{mismatches.png}
@@ -91,7 +91,10 @@ Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Di
 Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Case \texttt{Mismatch} wesentlich kürzere Laufzeiten für den sequentiellen Fall, als für den parallelen. Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
 
 \subsubsection{Festes n}
-%TODO LEGENDE
+
+\autoref{ref:n10000}
+\autoref{ref:n40000}
+
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 \begin{tikzpicture}
@@ -106,7 +109,7 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Cas
 \addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure0.csv};
 \addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure1.csv};
 \addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/10000/measure2.csv};
-\legend{0,1,2}
+\legend{Mismatch, FoundOne, Nothing}
 \end{axis}
 \end{tikzpicture}
 	\caption{n = 10000}
@@ -126,7 +129,7 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Cas
 \addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
 \addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
 \addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
-\legend{0,1,2}
+\legend{Mismatch, FoundOne, Nothing}
 \end{axis}
 \end{tikzpicture}
 	\caption{n = 40000}
@@ -135,7 +138,134 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Cas
 \end{figure}
 
 \subsubsection{Festes p}
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[           
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=n,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure0.csv};
+\addplot[blue, mark=*] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure1.csv};
+\addplot[red, mark=+] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{p = 44}
+	\label{ref:p44}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[           
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=n,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure0.csv};
+\addplot[blue, mark=*] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure1.csv};
+\addplot[red, mark=+] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{p = 1}
+	\label{ref:p1}
+\end{minipage}
+\end{figure}
 
+\paragraph{SpeedUp und Effizienz}
+
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[  			grid = major,
+			scale = 1,
+            grid style={dashed, gray!30},
+            ylabel=SpeedUp,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[black, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{SpeedUp: n = 40000}
+	\label{ref:speedUpn40000}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[  			grid = major,
+			scale = 1,
+            grid style={dashed, gray!30},
+            ylabel=SpeedUp,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[black, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{SpeedUp: n = 10000}
+	\label{ref:speedUpn10000}
+\end{minipage}
+\end{figure}
+
+\begin{figure}[h]
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[  			grid = major,
+			scale = 1,
+            grid style={dashed, gray!30},
+            ylabel=Effizienz,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[black, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{Effizienz: n = 40000}
+	\label{ref:Effizienzn40000}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[  			grid = major,
+			scale = 1,
+            grid style={dashed, gray!30},
+            ylabel=Effizienz,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[black, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{Effizienz: n = 10000}
+	\label{ref:Effizienzn10000}
+\end{minipage}
+\end{figure}
 
 \subsection{Fazit}
 
