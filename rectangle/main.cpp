@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     if (p % 2 == 1 && p > 1) {
         printFromMaster(rank, "Anzahl der Prozessoren muss gerade sein!", cerr);
         MPI_Finalize();
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     RectangleDetector detector = RectangleDetector();
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
             delete matrix;
         }
         MPI_Finalize();
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     if (p == RUNNING_SEQUENTIELL) {
