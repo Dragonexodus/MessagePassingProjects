@@ -21,17 +21,12 @@ int main(int argc, char **argv) {
 
     if (rank == MASTER) {
         std::string configFile = "config";
-
         if (argc > 1) {
             configFile = argv[1];
         }
         pair<short *, int> result = detector.readFile(configFile.c_str());
         matrix = result.first;
         n = result.second;
-
-        if (n % p != 0) {
-            n = INVALID_VALUE;
-        }
     }
 
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -51,9 +46,9 @@ int main(int argc, char **argv) {
 
     if (p == RUNNING_SEQUENTIELL) {
         const pair<int, RectangleValidator> &detectorResult = detector.search(matrix, n, n);
-        detector.printResult(detectorResult.first);
+        //detector.printResult(detectorResult.first);
         if (detectorResult.first == detector.RECT_FOUND) {
-            cout << detectorResult.second << endl;
+            //cout << detectorResult.second << endl;
         }
         if (matrix != NULL) {
             delete matrix;
@@ -106,13 +101,13 @@ void summarize(int p, int rank, RectangleDetector &detector, RectangleValidator 
         if(res==detector.RECT_FOUND&&processesWithRect.size()>1){
             res = checkPositions(detector, mainResult, processesWithRect, res);
         }
-        detector.printResult(res);
+        //detector.printResult(res);
         if (res == detector.RECT_FOUND) {
             validator.setStart(make_pair(mainResult[1 + processesWithRect.front() * RETURN_COUNT],
                                          mainResult[3 + processesWithRect.front() * RETURN_COUNT]));
             validator.setStop(make_pair(mainResult[2 + processesWithRect.back() * RETURN_COUNT],
                                         mainResult[4 + processesWithRect.back() * RETURN_COUNT]));
-            cout << validator << endl << endl;
+            //cout << validator << endl << endl;
         }
     }
 }
@@ -161,7 +156,7 @@ int checkPositions(const RectangleDetector &detector, const int *mainResult, vec
                 endX = stopX;
             } else {
                 if (endX != stopX || beginX != startX || endY != startY - 1) {
-                    cout << "closedRect" << endl;
+                    //cout << "closedRect" << endl;
                     res = detector.MISMATCH_FOUND;
                     break;
                 }
