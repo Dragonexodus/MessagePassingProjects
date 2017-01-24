@@ -127,7 +127,7 @@ Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit
 	\caption{p = 1}
 	\label{ref:p1}
 \end{minipage}
-\end{figure}
+\end{figure} %TODO Mehraufwand überprüfung Mismatch
 Wie man aus dem gegebenen Laufzeitmessungen (\autoref{ref:p1} \& \autoref{ref:p44}) für feste $p$ entnehmen kann, verschlechtert sich die Laufzeit beider Messungen quadratisch, dies ist mit dem Aufwand der Überprüfung des quadratischen Bildes zu begründen.
 Für den sequentiellen Fall liefern alle drei Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten, als für den parallelen. 
 Dies ist damit begründet, dass im sequentiellen Fall keine Kommunikation für die Auswertung notwendig ist, da der \texttt{Master} direkt seine Suche abbrechen kann. 
@@ -381,16 +381,17 @@ Nach erfolgter Berechnung sendet jeder Prozessor sein Ergebnis an den Master (fa
 \label{ref:ergebnisse}
 
 \subsubsection{Testfunktionen}
+In diesem Unterabschnitt wird auf die erzielten Ergebnisse der Testfunktion 1 und 2 hinsichtlich ihrer Näherung zu Pi eingegangen.
+Als Referenzwert für die Testunfktionen wurde Pi mit \textbf{3.141592653589793} verwendet.
+Angemerkt sei, dass die Prozessoranzahl 6 ausgeschlossen wurde, da dadurch bei Division durch die 2er Potenz von \textbf{n}, eine nicht ganzzahliges lokales \textbf{n} enstehen würde.
+Durch das lokale \textbf{n}, würde zwar ein Näherungswert zu Pi bestimmt, aber dieses besitzt eine deutlich größere Abweichungen im Vergleich zu einer korrekten Eingabe.
+Deswegen wird beim Programmstart diese Eingabe überprüft und ggf. bei falscher Eingabe das Programm beendet.
 
-Für die Testfunktionen wird der Referenzwert \textbf{3.141592653589793} verwendet.
 Die \autoref{ref:piP} zeigt die Abweichung zum Referenzwert von Pi bei einer konstanten Prozessoranzahl von 8 und einem sich verändernden \textbf{n}.
-Die \autoref{ref:piN} zeigt ebenfalls die Abweichung, aber hier wird ein konstantes \textbf{n} von 32768 verwendet und die Prozessoranzahl variiert.
-
-Wie in den Tabellen zu sehen ist liefert die Testfunktion 2 schneller bessere Pi-Näherungswerte als Funktion 1.
+Wie in der Tabelle zu sehen ist liefert die Testfunktion 2 schneller bessere Näherungswerte als Funktion 1.
 Ein Grund dafür, dass die Funktion 1 schlechte Näherungswerte liefert, liegt unter Anderem an der Oberegrenze.
 Diese Obergrenze ist Pi selbst.
 Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2, daher benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
-
 \begin{center}
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
@@ -416,27 +417,79 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 \end{minipage}
 \end{figure}
 \end{center}
+Die \autoref{ref:piN} zeigt ebenfalls die Abweichung, aber hier wird ein konstantes \textbf{n} von 32768 verwendet und die Prozessoranzahl variiert.
+Das die Näherungswerte sich in Abhängigkeit von der verwendeten Prozessorzahl unterscheiden ist damit begründet, dass die Parabelformel mittlere Teilstücke mit einem Faktor von 4 beziehungsweise 2 wichtet.
 
-
-%Speed-Up , Effizienz
 \subsubsection{Laufzeitverhalten}
-\paragraph{SpeedUp und Effizienz}
+Im vorherigen Abschnitt wurden die Ergebnisse der Testfunktionen hinsichtlich Pi untersucht und nun wird eine Betrachtung hinsichtlich der Laufzeit durchgeführt.
+
+Wie in der \autoref{ref:Laufzeitn} zu sehen ist, lohnt sich für diese Aufgabenstellung eine Parallelisierung.
+Mit steigendem p verringert sich die Laufzeit im Vergleich zum sequenziellen Fall.
+Es ist zu vermuten das mit steigendem p der Laufzeitgewinn immer schwächer wird und ab einem gewissen Punkt wieder eine Laufzeitverschlechterung eintritt.
+Begründet ist dies mit steigendem Kommukationsoverhead bei einer steigendem Prozessoranzahl.
+Bei der hier verwendeten geringen Anzahl an Prozessoren mit einem Maximum von 8, spielt der Kommunikationsoverhead eine eher untergeordnete Rolle.
+Zusätzlich ist zu sehen, dass die Testfunktion 1 langsamer ist als die Testfunktion 2 ist.
+Es wird vermutet, dass die Berechnung von Sinus in der Testfunktion 1 äufwändiger ist als die Division in der Testfunktion 2.
+\begin{figure}[h]
+\begin{minipage}{0.49\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[   		scale=0.9,
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Zeit in s,
+            xlabel=p,
+            legend style={at={(1.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=p, y=T15 , col sep=space]{../integration/speedUpF1.csv};
+\addplot[blue, mark=x] table [x=p, y=T15 , col sep=space]{../integration/speedUpF2.csv};
+\legend{Funktion 1, Funktion 2}
+\end{axis}
+\end{tikzpicture}
+	\caption{Laufzeit mit n = 32768}
+	\label{ref:Laufzeitn}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[   		scale=0.9,
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Zeit in s,
+            xlabel=n,
+            legend style={at={(5.1,-0.1)}, anchor=north}
+]
+\addplot[red, mark=*] table [x=n, y=T , col sep=space]{../integration/pConstF1.csv};
+\addplot[blue, mark=x] table [x=n, y=T , col sep=space]{../integration/pConstF2.csv};
+\legend{Funktion 1, Funktion 2}
+\end{axis}
+\end{tikzpicture}
+	\caption{Laufzeit mit p = 8}
+	\label{ref:LaufzeitP}
+\end{minipage}
+\end{figure}
+
+%TODO Laufzeit p
+
+\subsubsection{Speedup und Effizienz}
+%TODO
 
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [ 
            	grid = major,
-			scale = 1,
+			scale = 0.9,
             grid style={dashed, gray!30},
             ylabel=SpeedUp,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(1.1,-0.1)}, anchor=north}
 ]
 \addplot[red, mark=*] table [x=p, y=SpeedUp15 , col sep=space]{../integration/speedUpF1.csv};
-\addplot[blue, mark=+] table [x=p, y=SpeedUp12 , col sep=space]{../integration/speedUpF1.csv};
+\addplot[blue, mark=x] table [x=p, y=SpeedUp12 , col sep=space]{../integration/speedUpF1.csv};
 \addplot[black] table [x=p, y=IdealSpeedUp, col sep=space]{../integration/speedUpF1.csv};
 \legend{n = 32768,n = 4096, Ideal}
 \end{axis}
@@ -445,18 +498,18 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 	\label{ref:speedF1}
 \end{minipage}
 \hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [  			grid = major,
-			scale = 1,
+			scale = 0.9,
             grid style={dashed, gray!30},
             ylabel=SpeedUp,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(5.1,-0.1)}, anchor=north}
 ]
 \addplot[red, mark=*] table [x=p, y=SpeedUp15 , col sep=space]{../integration/speedUpF2.csv};
-\addplot[blue, mark=*] table [x=p, y=SpeedUp12 , col sep=space]{../integration/speedUpF2.csv};
+\addplot[blue, mark=x] table [x=p, y=SpeedUp12 , col sep=space]{../integration/speedUpF2.csv};
 \addplot[black] table [x=p, y=IdealSpeedUp, col sep=space]{../integration/speedUpF2.csv};
 \legend{n = 32768,n = 4096,Ideal}
 \end{axis}
@@ -467,15 +520,15 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 \end{figure}
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
-[   
+[   		scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
             ylabel=Effizienz,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(1.1,-0.1)}, anchor=north}
 ]
 \addplot[red, mark=*] table [x=p, y=Effizienz15 , col sep=space]{../integration/speedUpF1.csv};
 \addplot[blue, mark=x] table [x=p, y=Effizienz12 , col sep=space]{../integration/speedUpF1.csv};
@@ -487,15 +540,15 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 	\label{ref:EffizienzF1}
 \end{minipage}
 \hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
-[   
+[   		scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
             ylabel=Effizienz,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(5.1,-0.1)}, anchor=north}
 ]
 \addplot[red, mark=*] table [x=p, y=Effizienz15 , col sep=space]{../integration/speedUpF2.csv};
 \addplot[blue, mark=x] table [x=p, y=Effizienz12 , col sep=space]{../integration/speedUpF2.csv};
