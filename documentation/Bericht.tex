@@ -82,68 +82,15 @@ Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die
 Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder, welche im Bild umgedreht \linebreak ($0 \rightarrow 1,1 \rightarrow 0$) werden müssen. Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
 
 Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne dass diese tatsächlich  als physisch gespeichterte Dateien existieren müssen. Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
+
 \subsection{Laufzeitverhalten}
-Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ und feste $p$ mit variierende $n$ betrachtet. Für die Einflussfaktoren liegen die Obergrenzen bei $n=45000$ und $p=88$. Im folgenden werden dennoch Messungen bis maximal $n=40000$ und $p=44$ betrachtet, da Laufzeitverhalten, Speed-Up und Effizienz  für diese Größen ersichtlich sind und andere Benutzer das Cluster parallel nutzen.
-
-\autoref{ref:p1}
-\autoref{ref:p44}
-
-% Auswertungsoverhead durch Master (Auswertung von Gather - parallel)
-Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrachteten Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten für den sequentiellen Fall, als für den parallelen. Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
-
-\subsubsection{Festes n}
-
-\autoref{ref:n10000}
-\autoref{ref:n40000}
+Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ bis maximal 44 und feste $p$ mit variierende $n$ bis maximal 40000 betrachtet.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
-[           
-            grid = major,
-            grid style={dashed, gray!30},
-            ylabel=Time in s,
-            xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
-]
-\addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure1.csv};
-\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/10000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
-\end{axis}
-\end{tikzpicture}
-	\caption{n = 10000}
-	\label{ref:n10000}
-\end{minipage}
-\hfill
-\begin{minipage}{0.45\textwidth}
-\begin{tikzpicture}
-\begin{axis}
-[           
-            grid = major,
-            grid style={dashed, gray!30},
-            ylabel=Time in s,
-            xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
-]
-\addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
-\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
-\end{axis}
-\end{tikzpicture}
-	\caption{n = 40000}
-	\label{ref:n40000}
-\end{minipage}
-\end{figure}
-
-\subsubsection{Festes p}
-\begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
-\begin{tikzpicture}
-\begin{axis}
-[           
+[           scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
             ylabel=Time in s,
@@ -160,10 +107,10 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrach
 	\label{ref:p44}
 \end{minipage}
 \hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
-[           
+[           scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
             ylabel=Time in s,
@@ -181,15 +128,62 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrach
 \end{minipage}
 \end{figure}
 
-\paragraph{SpeedUp und Effizienz}
+Wie man aus dem gegebenen Laufzeitmessungen für feste $p$ entnehmen kann, liefern alle betrachteten Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten für den sequentiellen Fall (\autoref{ref:p1}), als für den parallelen (\autoref{ref:p44}). Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
+Es ist außerdem zu beobachten, dass in \autoref{ref:p1} \texttt{Nothing} die Untergrenze darstellt und nicht \texttt{Mismatch}. Dies ist damit begründet, dass der \texttt{Mismatch} in den letzten Pixeln liegt\footnote{Für die Messungen wird ein \texttt{Mismatch} am Ende einer Zeile durch $0 1 0$ erzeugt.} und nicht eher abgebrochen werden kann sondern immer alle $n*n$ Felder überprüft werden müssen. Ferner liefert \texttt{FoundOne} den Worst-Case für beide Messungen, da in beiden Fällen die ausschließenden Muster geprüft werden müssen.
 
+Durch die folgendenden Darstellungen wird das Laufzeitverhalten für ein festes $n$ ersichtlich.
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[           scale=0.9,
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/10000/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{n = 10000}
+	\label{ref:n10000}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+\begin{tikzpicture}
+\begin{axis}
+[           scale=0.9,
+            grid = major,
+            grid style={dashed, gray!30},
+            ylabel=Time in s,
+            xlabel=p,
+            legend style={at={(0.1,-0.1)}, anchor=north}
+]
+\addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\legend{Mismatch, FoundOne, Nothing}
+\end{axis}
+\end{tikzpicture}
+	\caption{n = 40000}
+	\label{ref:n40000}
+\end{minipage}
+\end{figure}
+
+Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für steigende $p$ logarithmisch verschlechtert. Das heißt für kleine $p$ ist der Anstieg der Laufzeit stets hoch, für große $p$ nimmt dieser Anstieg wieder ab bis die Laufzeit in Abhängigkeit von $p$ einer konstanten Funktion gleicht. Außerdem kann man erkennen, dass der sequentielle Fall wieder die besten Laufzeiten besitzt. Betrachtet man die unterschiedlichen Ergebnisse bildet \texttt{FoundOne} wieder den Worst-Case. Der Best-Case für $p=1$ kann diesmal durch \texttt{Mismatch} gezeigt werden, da ein vorzeitigen Abbruch durch das Vorkommen eines \texttt{Mismatches} in Zeile 4000 erreicht wird. Im parallelen Fall kann nicht eher abgebrochen werden, da erst alle Teilbilder durchsucht werden müssen, so dass ab eine Prozessorzahl von 2 \texttt{Nothing} und \texttt{Mismatch} das gleiche Laufzeitverhalten besitzen.
+
+\subsection{Speedup und Effizienz}
+\begin{figure}[h]
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [  			grid = major,
-			scale = 1,
+			scale=0.9,
             grid style={dashed, gray!30},
             ylabel=SpeedUp,
             xlabel=p,
@@ -205,11 +199,11 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrach
 	\label{ref:speedUpn40000}
 \end{minipage}
 \hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [  			grid = major,
-			scale = 1,
+			scale=0.9,
             grid style={dashed, gray!30},
             ylabel=SpeedUp,
             xlabel=p,
@@ -227,11 +221,11 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrach
 \end{figure}
 
 \begin{figure}[h]
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [  			grid = major,
-			scale = 1,
+			scale=0.9,
             grid style={dashed, gray!30},
             ylabel=Effizienz,
             xlabel=p,
@@ -247,11 +241,11 @@ Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrach
 	\label{ref:Effizienzn40000}
 \end{minipage}
 \hfill
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [  			grid = major,
-			scale = 1,
+			scale=0.9,
             grid style={dashed, gray!30},
             ylabel=Effizienz,
             xlabel=p,
