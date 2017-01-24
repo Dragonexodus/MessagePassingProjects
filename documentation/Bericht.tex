@@ -11,7 +11,7 @@
 \tableofcontents
 \pagebreak
 
-\section{Einleitung}
+\section{Überblick}
 In dieser Dokumentation werden die Aufgaben \qq{Rechteckmustererkennung} sowie \qq{Numerische Integration mittels Parabelformel} betrachtet und hinsichtlich ihrer Parallelität untersucht.
 Der entstandene Quellcode kann unter:\\
 \url{https://github.com/MZober1993/MessagePassingProjects}\footnote{Letzter Aufruf: \today}
@@ -20,7 +20,7 @@ eingesehen werden.
 In diesem Abschnitt wird die Umsetzung der Projektaufgabe 2 dargestellt, die Verwendung erläutert und Laufzeitverhalten, Speed-Up und Effizienz untersucht. Außerdem erfolgt eine Auswertung am Ende dieses Abschnitts.
 Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung für ein Digitalbild über ein Cluster realisieren.
 \subsection{Realisierung}
-
+\label{ref:realisierungRect}
 Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Pixel Bildes zu realisieren.
 Für die Parallelisierung muss jeder Prozessor diese sequentielle Erkennung auf sein Teilbild anwenden. Hierzu ist es notwendig, dass nach dem Einlesen des Bildes durch 
 einen ausgezeichneten Hauptprozess (\texttt{Master}), die resultierenden Teilbilder auf alle Prozesse verteilt werden. Diese Aufteilung wird im Programm durch \texttt{MPI\_Scatter} realisiert, durch diese Verteilung muss eine ungerade Prozessoranzahl ausgeschlossen werden.
@@ -127,12 +127,14 @@ Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit
 	\caption{p = 1}
 	\label{ref:p1}
 \end{minipage}
-\end{figure} %TODO Mehraufwand überprüfung Mismatch
+\end{figure}
 Wie man aus dem gegebenen Laufzeitmessungen (\autoref{ref:p1} \& \autoref{ref:p44}) für feste $p$ entnehmen kann, verschlechtert sich die Laufzeit beider Messungen quadratisch, dies ist mit dem Aufwand der Überprüfung des quadratischen Bildes zu begründen.
 Für den sequentiellen Fall liefern alle drei Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten, als für den parallelen. 
 Dies ist damit begründet, dass im sequentiellen Fall keine Kommunikation für die Auswertung notwendig ist, da der \texttt{Master} direkt seine Suche abbrechen kann. 
 Im parallelem Fall muss der \texttt{Master} auf alle Teilergebnisse der anderen Prozessoren warten, hierbei entsteht durch das Senden und Empfangen ein Kommunikationsoverhead, welcher bei steigender Anzahl der verwendeten Prozessoren erhöht wird.
-Außerdem ist zu beobachten, dass in \autoref{ref:p1} \texttt{Nothing} die Untergrenze darstellt und nicht \texttt{Mismatch}. Dies ist damit begründet, dass der \texttt{Mismatch} in den letzten Pixeln liegt\footnote{Für die Messungen wird ein \texttt{Mismatch} am Ende einer Zeile durch $0 1 0$ erzeugt.} und nicht eher abgebrochen werden kann, sondern immer alle $n*n$ Felder überprüft werden müssen. Ferner liefert \texttt{FoundOne} den Worst-Case für beide Messungen, da in beiden Fällen die ausschließenden Muster geprüft werden müssen. 
+Außerdem ist zu beobachten, dass in \autoref{ref:p1} \texttt{Nothing} die Untergrenze darstellt und nicht \texttt{Mismatch}. Dies ist damit begründet, dass der \texttt{Mismatch} in den letzten Pixeln liegt\footnote{Für die Messungen wird ein \texttt{Mismatch} am Ende einer Zeile durch $0 1 0$ erzeugt.} und nicht eher abgebrochen werden kann, sondern immer alle $n*n$ Felder überprüft werden müssen. 
+Neben dem bloßen Erkennen, ob es sich um weiße oder schwarze Pixel handelt, muss bei einem \texttt{Mismatch} wenigstens ein ausschließendes Muster von \autoref{fig:mismatches} überprüft worden sein, dieser Mehraufwand ist der Grund weshalb \texttt{Mismatch} ein schlechteres Laufzeitverhalten als \texttt{Nothing} in \autoref{ref:p1} aufweist.
+Ferner liefert \texttt{FoundOne} den Worst-Case für beide Messungen, da in beiden Fällen die ausschließenden Muster geprüft werden müssen. 
 Durch die folgendenden Darstellungen (\autoref{ref:n10000} \& \autoref{ref:n40000}) wird das Laufzeitverhalten für ein festes $n$ ersichtlich.
 
 \begin{figure}[t]
@@ -279,9 +281,17 @@ Im Anschluss wird näher auf die Effizienz eingegangen.
 
 
 Ähnlich zum Speedup weichen die Werte der Effizienz enorm zu einem normal parallelisierten Programm ab. 
-Somit kann nur für den sequentiellen Fall gezeigt werden, dass die Effizienz bei den Optimalwert $1$ liegt, wodurch niemals eine Verbesserung durch eine Parallelisierung für diese Problemstellung stattfindet. Außerdem erkennt man wie beim Speedup für größere $n$ (\autoref{ref:Effizienzn40000}) einen stärkeren Abfall als für kleinere $n$ dies ist wieder mit dem stärker ins Gewicht fallenden Kommunikationsoverhead zu begründen.
+Somit kann nur für den sequentiellen Fall gezeigt werden, dass die Effizienz bei den Optimalwert $1$ liegt, wodurch niemals eine Verbesserung durch eine Parallelisierung für diese Problemstellung stattfindet. Außerdem erkennt man wie beim Speedup für größere $n$ (\autoref{ref:Effizienzn40000}) einen stärkeren Abfall als für kleinere $n$, dies ist wieder durch den stärker ins Gewicht fallenden Kommunikationsoverhead zu begründen.
 
 \subsection{Fazit}
+Die Problemstellung eine Rechteckmustererkennung umzusetzen und zu parallelisieren konnte erfolgreich, wie in \autoref{ref:realisierungRect} beschrieben, umgesetzt werden. 
+Laufzeitmessungen ergaben, dass eine sequentielle Erkennung einer parallelen vorzuziehen ist, da diese eine starke Verschlechterung durch den anfallenden Kommunikationsoverhead erfährt. 
+Außerdem gibt es für die sequentielle Suche die Möglichkeit, dass sie vorzeitig abbrechen kann. 
+Anders als im parallelen Fall, da jeder Prozess sein Teilbild durchsuchen muss.
+Durch die Untersuchungen von variierenden $n$ konnte gezeigt werden, dass sich die Laufzeit quadratisch mit steigenden $n$ verschlechtert für alle $p$.
+Für die parallele Umsetzung verschlechtert sich die ohnehin schon schlechte Laufzeit noch mehr durch den zusätzlich steigenden Kommunikationsaufwand.
+Da sehr geringe Werte für Speedup und Effizienz ermittelt worden, wurde bewiesen dass die Problemstellung sich nicht für die Parallelisierung eignet.
+Folglich wird für die Erkennung von Rechteckmustern die sequentielle Variante empfohlen.
 
 \pagebreak
 
