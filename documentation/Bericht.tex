@@ -74,18 +74,19 @@ Für das Programm können Kommandozeilenargumente zur Angabe des Konfigurationsf
 
 \subsubsection{Konfigurationsfile}
 Die Anwendung unterstützt drei Modi zur Erzeugung des Digitalbildes, welcher dieser Modi verwendet wird, steht immer in der ersten Zeile des Files.
-
 \paragraph{Modus 2: Custom Mode}Der \texttt{Custom Mode} ermöglicht die direkte Angabe einer $n*n$ Matrix (ab Zeile zwei) aus Nullen und Einzen.
-
 \paragraph{Modus 1: Single Fields \& Modus 0: Rectangle}
-Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte Angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird. Die zweite Zeile beschreibt die Größe $n$ und die Dritte die zu verwendende Hintergrundfarbe (0 oder 1). Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden. \\
-Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder, welche im Bild umgedreht \linebreak ($0 \rightarrow 1,1 \rightarrow 0$) werden müssen. Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
-
-Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne dass diese tatsächlich  als physisch gespeichterte Dateien existieren müssen. Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
-
+Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte Angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird.
+Die zweite Zeile beschreibt die Größe $n$ und die Dritte die zu verwendende Hintergrundfarbe (0 oder 1). 
+Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden.
+Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder, welche im Bild umgedreht \linebreak ($0 \rightarrow 1,1 \rightarrow 0$) werden müssen. 
+Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. 
+Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
+Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne dass diese tatsächlich  als physisch gespeichterte Dateien existieren müssen. 
+Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. 
+Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
 \subsection{Laufzeitverhalten}
 Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ bis maximal 44 und feste $p$ mit variierende $n$ bis maximal 40000 betrachtet.
-
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
@@ -95,12 +96,12 @@ Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit
             grid style={dashed, gray!30},
             ylabel=Time in s,
             xlabel=n,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(1.1,-0.1)}, anchor=north}
 ]
+\addplot[red, mark=*] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure1.csv};
+\addplot[blue, mark=+] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure2.csv};
 \addplot[black, mark=x] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure0.csv};
-\addplot[blue, mark=*] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure1.csv};
-\addplot[red, mark=+] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/44/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{p = 44}
@@ -115,25 +116,26 @@ Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit
             grid style={dashed, gray!30},
             ylabel=Time in s,
             xlabel=n,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(5.1,-0.1)}, anchor=north}
 ]
+\addplot[red, mark=*] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure1.csv};
+\addplot[blue, mark=+] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure2.csv};
 \addplot[black, mark=x] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure0.csv};
-\addplot[blue, mark=*] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure1.csv};
-\addplot[red, mark=+] table [x=n, y=Mittel , col sep=space] {../rectangle/measures/nScaling/1/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{p = 1}
 	\label{ref:p1}
 \end{minipage}
 \end{figure}
+Wie man aus dem gegebenen Laufzeitmessungen (\autoref{ref:p1} \& \autoref{ref:p44}) für feste $p$ entnehmen kann, verschlechtert sich die Laufzeit beider Messungen quadratisch, dies ist mit dem Aufwand der Überprüfung des quadratischen Bildes zu begründen.
+Für den sequentiellen Fall liefern alle drei Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten, als für den parallelen. 
+Dies ist damit begründet, dass im sequentiellen Fall keine Kommunikation für die Auswertung notwendig ist, da der \texttt{Master} direkt seine Suche abbrechen kann. 
+Im parallelem Fall muss der \texttt{Master} auf alle Teilergebnisse der anderen Prozessoren warten, hierbei entsteht durch das Senden und Empfangen ein Kommunikationsoverhead, welcher bei steigender Anzahl der verwendeten Prozessoren erhöht wird.
+Außerdem ist zu beobachten, dass in \autoref{ref:p1} \texttt{Nothing} die Untergrenze darstellt und nicht \texttt{Mismatch}. Dies ist damit begründet, dass der \texttt{Mismatch} in den letzten Pixeln liegt\footnote{Für die Messungen wird ein \texttt{Mismatch} am Ende einer Zeile durch $0 1 0$ erzeugt.} und nicht eher abgebrochen werden kann, sondern immer alle $n*n$ Felder überprüft werden müssen. Ferner liefert \texttt{FoundOne} den Worst-Case für beide Messungen, da in beiden Fällen die ausschließenden Muster geprüft werden müssen. 
+Durch die folgendenden Darstellungen (\autoref{ref:n10000} \& \autoref{ref:n40000}) wird das Laufzeitverhalten für ein festes $n$ ersichtlich.
 
-Wie man aus dem gegebenen Laufzeitmessungen für feste $p$ entnehmen kann, liefern alle betrachteten Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten für den sequentiellen Fall (\autoref{ref:p1}), als für den parallelen (\autoref{ref:p44}). Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
-Es ist außerdem zu beobachten, dass in \autoref{ref:p1} \texttt{Nothing} die Untergrenze darstellt und nicht \texttt{Mismatch}. Dies ist damit begründet, dass der \texttt{Mismatch} in den letzten Pixeln liegt\footnote{Für die Messungen wird ein \texttt{Mismatch} am Ende einer Zeile durch $0 1 0$ erzeugt.} und nicht eher abgebrochen werden kann sondern immer alle $n*n$ Felder überprüft werden müssen. Ferner liefert \texttt{FoundOne} den Worst-Case für beide Messungen, da in beiden Fällen die ausschließenden Muster geprüft werden müssen.
-
-Durch die folgendenden Darstellungen wird das Laufzeitverhalten für ein festes $n$ ersichtlich.
-
-\begin{figure}[h]
+\begin{figure}[t]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
@@ -142,12 +144,12 @@ Durch die folgendenden Darstellungen wird das Laufzeitverhalten für ein festes 
             grid style={dashed, gray!30},
             ylabel=Time in s,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(1.1,-0.1)}, anchor=north}
 ]
+\addplot[red, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[blue, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/10000/measure2.csv};
 \addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/10000/measure1.csv};
-\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/10000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{n = 10000}
@@ -162,12 +164,12 @@ Durch die folgendenden Darstellungen wird das Laufzeitverhalten für ein festes 
             grid style={dashed, gray!30},
             ylabel=Time in s,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(5.1,-0.1)}, anchor=north}
 ]
+\addplot[red, mark=*]  table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[blue, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
 \addplot[black, mark=x] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=Mittel , col sep=space] {../rectangle/measures/processorScaling/44/40000/measure1.csv};
-\addplot[red, mark=+] table [x=p, y=Mittel,, col sep=space] {../rectangle/measures/processorScaling/44/40000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{n = 40000}
@@ -175,9 +177,14 @@ Durch die folgendenden Darstellungen wird das Laufzeitverhalten für ein festes 
 \end{minipage}
 \end{figure}
 
-Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für steigende $p$ logarithmisch verschlechtert. Das heißt für kleine $p$ ist der Anstieg der Laufzeit stets hoch, für große $p$ nimmt dieser Anstieg wieder ab bis die Laufzeit in Abhängigkeit von $p$ einer konstanten Funktion gleicht. Außerdem kann man erkennen, dass der sequentielle Fall wieder die besten Laufzeiten besitzt. Betrachtet man die unterschiedlichen Ergebnisse bildet \texttt{FoundOne} wieder den Worst-Case. Der Best-Case für $p=1$ kann diesmal durch \texttt{Mismatch} gezeigt werden, da ein vorzeitigen Abbruch durch das Vorkommen eines \texttt{Mismatches} in Zeile 4000 erreicht wird. Im parallelen Fall kann nicht eher abgebrochen werden, da erst alle Teilbilder durchsucht werden müssen, so dass ab eine Prozessorzahl von 2 \texttt{Nothing} und \texttt{Mismatch} das gleiche Laufzeitverhalten besitzen.
-
+Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für steigende $p$ logarithmisch verschlechtert. 
+Das heißt für kleine $p$ ist der Anstieg der Laufzeit stets hoch, für große $p$ nimmt dieser Anstieg wieder ab bis die Laufzeit in Abhängigkeit von $p$ einer konstanten Funktion gleicht. 
+Außerdem kann man erkennen, dass der sequentielle Fall wieder die besten Laufzeiten besitzt. 
+Betrachtet man die unterschiedlichen Ergebnisse bildet \texttt{FoundOne} wieder den Worst-Case. 
+Der Best-Case für $p=1$ kann diesmal durch \texttt{Mismatch} gezeigt werden, da ein vorzeitigen Abbruch durch das Vorkommen eines \texttt{Mismatches} in Zeile 4000 erreicht wird. 
+Im parallelen Fall kann nicht eher abgebrochen werden, da erst alle Teilbilder durchsucht werden müssen, so dass ab eine Prozessorzahl von 2 \texttt{Nothing} und \texttt{Mismatch} das gleiche Laufzeitverhalten besitzen.
 \subsection{Speedup und Effizienz}
+Die folgenden Abbildungen beziehen sich auf die Auswertungen zum Speedup und zur Effizienz. 
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
@@ -187,12 +194,12 @@ Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für s
             grid style={dashed, gray!30},
             ylabel=SpeedUp,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(1.1,-0.1)}, anchor=north}
 ]
-\addplot[red, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure1.csv};
-\addplot[black, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\addplot[red, mark=*]  table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[blue, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\addplot[black, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{SpeedUp: n = 40000}
@@ -207,19 +214,27 @@ Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für s
             grid style={dashed, gray!30},
             ylabel=SpeedUp,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(5.1,-0.1)}, anchor=north}
 ]
-\addplot[red, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure1.csv};
-\addplot[black, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\addplot[red, mark=*]  table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[blue, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure2.csv};
+\addplot[black, mark=*] table [x=p, y=SpeedUp , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure0.csv};
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{SpeedUp: n = 10000}
 	\label{ref:speedUpn10000}
 \end{minipage}
 \end{figure}
+Wie schon bei der Untersuchtung des Laufzeitverhaltens bemerkt wurde, verschlechtert sich die Laufzeit für den parallelen Fall enorm. 
+Dieses Verhalten wird durch \autoref{ref:speedUpn10000} und \autoref{ref:speedUpn40000} bestätigt. 
+Anstatt einen linearen Anstieg anzustreben, ähnelt die Funktion einer Hyperbel mit indirekter Proportionalität für alle Messungen. 
+Mit steigenden $n$ müssen größere Teilbilder an alle Prozessoren kommuniziert werden, deshalb ist der Anstieg für $n=40000$ flacher als für $n=10000$, da der Kommunikationsoverhead stärker ins Gewicht fällt als die eigentliche Überprüfung. 
+Außerdem erkennt man aus den Speedup-Darstellungen, die Abhängigkeit zu der sequentiellen Laufzeit. 
+So dass der eigentliche Best-Case nun den schlechtesten Speedup aufweist, da der Referenzwert im sequentiellen Fall wesentlich geringer ist als die anderen Referenzwerte. 
+Entsprechend verhält sich der Average-Case und Worst-Case. Folglich konnte gezeigt werden, dass die Problemstellung nicht geeignet ist für die Parallelisierung durch die anfallende Kommunikation. 
 
+Im Anschluss wird näher auf die Effizienz eingegangen.
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
@@ -229,12 +244,12 @@ Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für s
             grid style={dashed, gray!30},
             ylabel=Effizienz,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(1.1,-0.1)}, anchor=north}
 ]
-\addplot[red, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure1.csv};
-\addplot[black, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\addplot[red, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure1.csv};
+\addplot[blue, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure2.csv};
+\addplot[black, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/40000/measure0.csv};
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{Effizienz: n = 40000}
@@ -249,18 +264,22 @@ Aus den Darstellungen kann man entnehmen, dass sich das Laufzeitverhalten für s
             grid style={dashed, gray!30},
             ylabel=Effizienz,
             xlabel=p,
-            legend style={at={(0.1,-0.1)}, anchor=north}
+            legend style={at={(5.1,-0.1)}, anchor=north}
 ]
-\addplot[red, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure0.csv};
-\addplot[blue, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure1.csv};
-\addplot[black, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure2.csv};
-\legend{Mismatch, FoundOne, Nothing}
+\addplot[red, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure1.csv};
+\addplot[blue, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure2.csv};
+\addplot[black, mark=*] table [x=p, y=Effizienz , col sep=space]{../rectangle/measures/processorScaling/44/10000/measure0.csv};
+\legend{FoundOne, Nothing,Mismatch}
 \end{axis}
 \end{tikzpicture}
 	\caption{Effizienz: n = 10000}
 	\label{ref:Effizienzn10000}
 \end{minipage}
 \end{figure}
+
+
+Ähnlich zum Speedup weichen die Werte der Effizienz enorm zu einem normal parallelisierten Programm ab. 
+Somit kann nur für den sequentiellen Fall gezeigt werden, dass die Effizienz bei den Optimalwert $1$ liegt, wodurch niemals eine Verbesserung durch eine Parallelisierung für diese Problemstellung stattfindet. Außerdem erkennt man wie beim Speedup für größere $n$ (\autoref{ref:Effizienzn40000}) einen stärkeren Abfall als für kleinere $n$ dies ist wieder mit dem stärker ins Gewicht fallenden Kommunikationsoverhead zu begründen.
 
 \subsection{Fazit}
 
