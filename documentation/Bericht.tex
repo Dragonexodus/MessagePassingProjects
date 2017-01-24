@@ -17,16 +17,15 @@ Der entstandene Quellcode kann unter:\\
 \url{https://github.com/MZober1993/MessagePassingProjects}\footnote{Letzter Aufruf: \today}
 eingesehen werden.
 \section{Projektaufgabe 1: Rechteckmustererkennung}
-Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung über ein Cluster realisieren.
+In diesem Abschnitt wird die Umsetzung der Projektaufgabe 2 dargestellt, die Verwendung erläutert und Laufzeitverhalten, Speed-Up und Effizienz untersucht. Außerdem erfolgt eine Auswertung am Ende dieses Abschnitts.
+Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung für ein Digitalbild über ein Cluster realisieren.
 \subsection{Realisierung}
-%Pseudocode? Verwendung (config), argumente,...
-%Einschränkung (gerade Prozessoranzahl etc)
-%Vll. Scatter und Gather nochmal erklären
 
-Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Digitalbild zu realisieren.
-Die sequentielle Erkennung ist der Teil des Programms der sich nicht parallelisieren lässt. Für die Parallelisierung muss jeder Prozessor diese Erkennung auf sein Teilbild anwenden.
+Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Pixel Bildes zu realisieren.
+Für die Parallelisierung muss jeder Prozessor diese sequentielle Erkennung auf sein Teilbild anwenden. Hierzu ist es notwendig, dass nach dem Einlesen des Bildes durch 
+einen ausgezeichneten Hauptprozess (\texttt{Master}), die resultierenden Teilbilder auf alle Prozesse verteilt werden. Diese Aufteilung wird im Programm durch \texttt{MPI\_Scatter} realisiert, durch diese Verteilung muss eine ungerade Prozessoranzahl ausgeschlossen werden.
 
-Im Wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} \& \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} \& \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
+Im Wesentlichen wird ein Rechteck durch das Finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} \& \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} \& \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.75]{mismatches.png}
@@ -36,7 +35,7 @@ Im Wesentlichen wird ein Rechteck durch dass finden eines schwarzen Pixels \line
 
 Werden diese Muster nicht erkannt, aber schwarze Pixel, dann existiert ein Rechteck (\texttt{FoundOne}). Andernfalls werden nicht zuzuordnende schwarze Pixel (\texttt{Mismatch}) oder gar keine schwarzen Pixel (\texttt{Nothing}) im Bild gefunden.
 
-Nachdem jeder Prozess sein Teilbild bearbeitet hat muss ein ausgezeichneter Hauptprozess (\texttt{Master}) alle Ergebnisse zusammenfassen, dies geschieht in den folgenden Schritten.
+Nachdem jeder Prozess sein Teilbild bearbeitet hat, muss der \texttt{Master} alle Ergebnisse zusammenfassen. Zunächst sammelt der \texttt{Master} alle Teilergebnisse mit \texttt{MPI\_Gather} ein, danach bewertet er die Ergebnisse in folgenden Schritten.
 
 \begin{enumerate}
 	\item Gibt es ein Teilbild mit schwarzen Pixeln, welche aber kein Rechteck bilden, dann kann direkt abgebrochen werden mit: \texttt{Mismatch}.
@@ -80,15 +79,17 @@ Die Anwendung unterstützt drei Modi zur Erzeugung des Digitalbildes, welcher di
 
 \paragraph{Modus 1: Single Fields \& Modus 0: Rectangle}
 Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte Angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird. Die zweite Zeile beschreibt die Größe $n$ und die Dritte die zu verwendende Hintergrundfarbe (0 oder 1). Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden. \\
-Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder, welche im Bild umgedreht werden müssen. Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
+Durch die vierte Zeile werden Koordinatenpaare in der Form: \texttt{x y} angegeben. Modus 1 interpretiert diese Koordinaten als einzelne Felder, welche im Bild umgedreht \linebreak ($0 \rightarrow 1,1 \rightarrow 0$) werden müssen. Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als die Ortsvektoren der oberen Rechteck-Ecke, die das Rechteck aufspannt. Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
 
-Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne das diese tatsächlich  als physisch gespeichterte Dateien existieren müssen. Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
-%Speed-Up , Effizienz
-%Wo liegt das Maximum für das zu untersuchende quadratische Raster?
-%Kommunikationsoverhead
+Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne dass diese tatsächlich  als physisch gespeichterte Dateien existieren müssen. Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
 \subsection{Laufzeitverhalten}
+Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ und feste $p$ mit variierende $n$ betrachtet. Für die Einflussfaktoren liegen die Obergrenzen bei $n=45000$ und $p=88$. Im folgenden werden dennoch Messungen bis maximal $n=40000$ und $p=44$ betrachtet, da Laufzeitverhalten, Speed-Up und Effizienz  für diese Größen ersichtlich sind und andere Benutzer das Cluster parallel nutzen.
+
+\autoref{ref:p1}
+\autoref{ref:p44}
+
 % Auswertungsoverhead durch Master (Auswertung von Gather - parallel)
-Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefert der Best-Case \texttt{Mismatch} wesentlich kürzere Laufzeiten für den sequentiellen Fall, als für den parallelen. Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
+Wie man aus dem gegebenen Laufzeitmessungen entnehmen kann, liefern alle betrachteten Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten für den sequentiellen Fall, als für den parallelen. Dies ist damit begründet, dass kein Kommunikationsoverhead für die Auswertung existiert, da der \texttt{Master} direkt seine Suche abbrechen kann, während im parallele Programm der \texttt{Master} auf alle Teilergebnisse warten muss.
 
 \subsubsection{Festes n}
 
