@@ -456,7 +456,8 @@ Mit steigendem \textbf{p} verringert sich die Laufzeit im Vergleich zum sequenzi
 Es ist zu vermuten das mit steigendem \textbf{p} der Laufzeitgewinn immer schwächer wird und ab einem gewissen Punkt wieder eine Laufzeitverschlechterung eintritt.
 Begründet ist dies mit steigendem Kommukationsoverhead bei einer steigendem Prozessoranzahl.
 Bei der hier verwendeten geringen Anzahl an Prozessoren mit einem Maximum von 8, spielt der Kommunikationsoverhead eine eher untergeordnete Rolle.
-Zusätzlich ist zu sehen, dass die Testfunktion 1 langsamer ist als die Testfunktion 2 ist.
+Zusätzlich ist zu sehen, dass die Testfunktion 1 langsamer ist als die Testfunktion 2.
+%TODO Eventuell noch einmal umformulieren
 Es wird vermutet, dass die Berechnung von Sinus in der Testfunktion 1 äufwändiger ist als die Division in der Testfunktion 2.
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
@@ -506,11 +507,13 @@ Die Ergebnisse entsprechen dem erwarteten Verhalten, denn mit steigendem \textbf
 In diesem Abschnitt sollen nun Speedup und Effizienz für die Testfunktionen 1 und 2 betrachtet werden.
 
 In der \autoref{ref:speedF1} ist der ermittelte Speedup für die Tesfunktion 1 mit zwei verschieden Werten für \textbf{n} zu sehen.
-Bei einem großem \textbf{n} ist zu sehen, dass ein deutlich beserer Speedup erzielt wird, als bei einem kleineren \textbf{n}.
+Bei einem großem \textbf{n} ist zu sehen, dass ein deutlich besserer Speedup erzielt wird, als bei einem kleineren \textbf{n}.
 Dieses Verhalten wird auch in der Funktion 2 nachgewiesen, wie man in der \autoref{ref:speedF2} sehen kann.
 Bei einem kleinen \textbf{n} flacht der Speedup bedeutend schneller ab.
 Bedingt ist dies dadurch, dass bei einem kleineren \textbf{n} die Laufzeit für die Kommunikation und Summieren der Ergebnisse markanter in die Berechnung eingeht.
+%TODO nochmal drüber reden: Ich denke die eigentliche Begründung ist die, dass die Ausführung so schnell wird, dass der geringe Komm-Overhead mehr ins Gewicht fallen kann, das sollte so oder so ähnlich erwähnt werden (auch im Fazit)
 Dennoch lässt sich sagen, dass bei dieser Aufgabe bei maximal 8 Prozessoren ein sehr guter Speedup erreicht werden kann.
+%TODO nochmal überarbeiten
 Dies gilt sowohl für Funktion 1 als auch Funktion 2, wobei Funktion 2 einen etwas schlechteren Speedup als Funktion 1 erreicht.
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
@@ -554,13 +557,14 @@ Dies gilt sowohl für Funktion 1 als auch Funktion 2, wobei Funktion 2 einen etw
 	\label{ref:speedF2}
 \end{minipage}
 \end{figure}
-
+%TODO Nun betrachten wir klingt ein wenig wie ein Dialog, verwende weniger Umgangssprache
 Nun betrachten wir die Funktionen hinsichtlich ihrer Effizienz.
 In der \autoref{ref:EffizienzF1} und \autoref{ref:EffizienzF2} ist die Effizienz für die Funktion 1 sowie 2 dargestellt.
 Aufgrund das bei einem großen \textbf{n} ein besserer Speedup erzielt wird, werden bei Funktion 1 und 2 relativ hohe Effizienzwerte erreicht.
 Es ist außerdem zu sehen, dass Funktion 1 im Allgemeinen effizienter ist als Funktion 2.
 Außerdem wird die höchste Effizienz bei der Parallelisierung mit 2 Prozessoren erreicht.
 Dies gilt für Funktion 1 und Funktion 2 gleichermaßen.
+%TODO mir nochmal erklären und überarbeiten
 Bei einem kleineren \textbf{n} sinkt die Effizienz bedeutend schneller als bei einem großen, wobei auch hier Funktion 1 im Allgemeinen besser ist.
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
@@ -609,9 +613,12 @@ Bei einem kleineren \textbf{n} sinkt die Effizienz bedeutend schneller als bei e
 Die Problemstellung der numerischen Integration mittels Parabelformel konnte erfolgreich in Fortran umgesetzt werden.
 Laufzeitmessungen sowie Betrachtung von Speedup und Effizienz ergaben, dass eine Parallelisierung für diese Aufgabenstellung sehr geeignet ist.
 Aufgrund des geringen Kommunikationsoverhead fällt dieser bei der geringen Prozessoranzahl ($\textbf{p} \le 8$) kaum ins Gewicht, falls das \textbf{n} ausreichend groß ist.
+%TODO für kleine n sind die Laufzeitmessungen generell gering -> folglich ist der Speedup geringer, das hängt aber nicht an einen zu spürenden Komm-Overhead, sondern an der kaum zu spürenden Verbesserung
 Bei einem kleinen \textbf{n} ist dieser Kommunikationsoverhead mit anschließender Summation doch zu spüren wie die Betrachtung des Speedups ergab.
 
 Zusätzlich ist festzuhalen, dass die Funktion 2 bessere Näherungswerte für Pi liefert als die Funktion 1.
+%TODO ... eignet sich Funktion 1 mehr für die Parallelisierung.
+%TODO Beleg dazu und mir nochmal erklären
 Obwohl die Funktion 2 ein besseres Laufzeitverhalten als Funktion 1 besitzt, ist Funktion 1 doch etwas effizienter bei der Parallelisierung.
 
 \end{document}
