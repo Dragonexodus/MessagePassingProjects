@@ -3,30 +3,36 @@
 \title{Dokumentation zu den Projektaufgaben 1 und 2}
 \subtitle{Message Passing Programmierung}
 
-\author{Matthias Zober und Michael Horn}
+\author{Matthias Zober und Michael Horn\vspace{5cm}}
 \date{\today}
 \begin{document}
-\maketitle
 
+\maketitle
 \tableofcontents
+\thispagestyle{empty}
 \pagebreak
+\setcounter{page}{1}
 
 \section{Überblick}
 In dieser Dokumentation werden die Aufgaben \qq{Rechteckmustererkennung} sowie \qq{Numerische Integration mittels Parabelformel} betrachtet und hinsichtlich ihrer Parallelität untersucht.
 Der entstandene Quellcode kann unter:\\
 \url{https://github.com/MZober1993/MessagePassingProjects}\footnote{Letzter Aufruf: \today}
-eingesehen werden.
+eingesehen werden.\\
+Ebenfalls befinden sich in diesem Repository alle ermittelten Messwerte als CSV-Dateien sowie die erstellten Skripte zur Ermittlung der Laufzeiten.
+
 \section{Projektaufgabe 1: Rechteckmustererkennung}
 In diesem Abschnitt wird die Umsetzung der Projektaufgabe 2 dargestellt, die Verwendung erläutert und Laufzeitverhalten, Speed-Up und Effizienz untersucht. Außerdem erfolgt eine Auswertung am Ende dieses Abschnitts.
 Das zu spezifizierende parallele Programm soll eine Rechteckmustererkennung für ein Digitalbild über ein Cluster realisieren.
+
 \subsection{Realisierung}
 \label{ref:realisierungRect}
 Für die Umsetzung eines solchen Programms, ist es zunächst notwendig eine sequentielle Erkennung eines $n*m$ Pixel Bildes zu realisieren.
 Für die Parallelisierung muss jeder Prozessor diese sequentielle Erkennung auf sein Teilbild anwenden. Hierzu ist es notwendig, dass nach dem Einlesen des Bildes durch 
 einen ausgezeichneten Hauptprozess (\texttt{Master}), die resultierenden Teilbilder auf alle Prozesse verteilt werden. Diese Aufteilung wird im Programm durch \texttt{MPI\_Scatter} realisiert, durch diese Verteilung muss eine ungerade Prozessoranzahl ausgeschlossen werden.
 
-Im Wesentlichen wird ein Rechteck durch das Finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. Die Erkennung kann einfach realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} \& \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} \& \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
-\begin{figure}[h]
+Im Wesentlichen wird ein Rechteck durch das Finden eines schwarzen Pixels \linebreak(schwarz=0, weiß=1) und das Überprüfen von ausschließenden Mustern. 
+Die Erkennung kann realisiert werden durch die Speicherung der Koordinaten des ersten (\texttt{startX} und \texttt{startY}) und zuletzt gefundenen Pixels (\texttt{stopX} und \texttt{stopY}) und die Länge der oberen gefunden Rechteckkante (\texttt{xSize}). Im folgenden erkennt man die ausschließenden Mustern mit deren Regeln.
+\begin{figure}[htb]
     \centering
     \includegraphics[scale=0.75]{mismatches.png}
     \caption{Ausschließende Bit-Muster mit Regeln}
@@ -46,15 +52,14 @@ Nachdem jeder Prozess sein Teilbild bearbeitet hat, muss der \texttt{Master} all
 Falls mehrere \texttt{FoundOne} vorliegen und vorher nicht abgebrochen wurde muss der \texttt{Master} überprüfen ob die gefundenen Rechtecke zusammenhängend sind, dies kann durch folgende Kriterien überprüft werden.
 
 \begin{enumerate}
-	\item Die Start- \& Stop-X Werte stimmen bei jedem Rechteck überein.
+	\item Die Start- und Stop-X Werte stimmen bei jedem Rechteck überein.
 	\item Bis auf dem ersten Prozess der ein Rechteck in einer Zeile gefunden hat, müssen alle schwarze Pixel in ihrer ersten Zeile finden.
 	\item Bis auf dem letzten Prozess der ein Rechteck gefunden hat, müssen alle schwarzen Pixel in ihrer letzten Zeile finden.
 \end{enumerate}
 
-Nach dieser letzten Überprüfung kann der Master-Prozess das Ergebnis ermitteln und die Start- \& Stopp-Koordinaten des gefundenen Rechtecks ausgeben. 
+Nach dieser letzten Überprüfung kann der Master-Prozess das Ergebnis ermitteln und die Start- und Stopp-Koordinaten des gefundenen Rechtecks ausgeben. 
 
 Durch die Betrachtung der Umsetztung stellt man fest, dass für den Algorithmus ein Best-Case darin besteht sofort ein \texttt{Mismatch} zu finden, da direkt abgebrochen werden kann. Der Average-Case stellt ein Digitalbild ohne schwarze Pixel dar, da nach überprüfen aller Pixel abgebrochen werden kann, aber keine weiteren Überprufungen stattfinden. Der Worst-Case besteht darin mehrere Rechtecke zu finden, da alle Rechtecke zusammenhängend sein müssen. Für die Untersuchungen zur Laufzeit werden diese drei Fälle berücksichtigt.
-
 
 \subsection{Verwendung}
 \subsubsection{Ausführung}
@@ -75,7 +80,7 @@ Für das Programm können Kommandozeilenargumente zur Angabe des Konfigurationsf
 \subsubsection{Konfigurationsfile}
 Die Anwendung unterstützt drei Modi zur Erzeugung des Digitalbildes, welcher dieser Modi verwendet wird, steht immer in der ersten Zeile des Files.
 \paragraph{Modus 2: Custom Mode}Der \texttt{Custom Mode} ermöglicht die direkte Angabe einer $n*n$ Matrix (ab Zeile zwei) aus Nullen und Einzen.
-\paragraph{Modus 1: Single Fields \& Modus 0: Rectangle}
+\paragraph{Modus 1: Single Fields und Modus 0: Rectangle}
 Um eine komfortable Eingabe zu realisieren, wird für die Modi 1 und 0 nicht die direkte Angabe der Matrix sondern nur die angabe einzelne Parameter realisiert, aus denen dann das Digitalbild im Programm generiert wird.
 Die zweite Zeile beschreibt die Größe $n$ und die Dritte die zu verwendende Hintergrundfarbe (0 oder 1). 
 Aus diesen zwei Parametern kann im Programm leicht eine $n*n$ Matrix der angegebenen Hintergrundfarbe (0 oder 1) generiert werden.
@@ -85,16 +90,17 @@ Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke recht
 Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne dass diese tatsächlich  als physisch gespeichterte Dateien existieren müssen. 
 Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. 
 Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
+
 \subsection{Laufzeitverhalten}
 Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ bis maximal 44 und feste $p$ mit variierende $n$ bis maximal 40000 betrachtet.
-\begin{figure}[h]
+\begin{figure}[htb]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [           scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
-            ylabel=Time in s,
+            ylabel=Zeit in s,
             xlabel=n,
             legend style={at={(1.1,-0.1)}, anchor=north}
 ]
@@ -114,7 +120,7 @@ Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit
 [           scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
-            ylabel=Time in s,
+            ylabel=Zeit in s,
             xlabel=n,
             legend style={at={(5.1,-0.1)}, anchor=north}
 ]
@@ -128,23 +134,22 @@ Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit
 	\label{ref:p1}
 \end{minipage}
 \end{figure}
-Wie man aus dem gegebenen Laufzeitmessungen (\autoref{ref:p1} \& \autoref{ref:p44}) für feste $p$ entnehmen kann, verschlechtert sich die Laufzeit beider Messungen quadratisch, dies ist mit dem Aufwand der Überprüfung des quadratischen Bildes zu begründen.
+Wie man aus dem gegebenen Laufzeitmessungen (\autoref{ref:p44} und \autoref{ref:p1}) für feste $p$ entnehmen kann, verschlechtert sich die Laufzeit beider Messungen quadratisch, dies ist mit dem Aufwand der Überprüfung des quadratischen Bildes zu begründen.
 Für den sequentiellen Fall liefern alle drei Fälle: \texttt{Mismatch}, \texttt{FoundOne} und \texttt{Nothing} wesentlich kürzere Laufzeiten, als für den parallelen. 
 Dies ist damit begründet, dass im sequentiellen Fall keine Kommunikation für die Auswertung notwendig ist, da der \texttt{Master} direkt seine Suche abbrechen kann. 
 Im parallelem Fall muss der \texttt{Master} auf alle Teilergebnisse der anderen Prozessoren warten, hierbei entsteht durch das Senden und Empfangen ein Kommunikationsoverhead, welcher bei steigender Anzahl der verwendeten Prozessoren erhöht wird.
 Außerdem ist zu beobachten, dass in \autoref{ref:p1} \texttt{Nothing} die Untergrenze darstellt und nicht \texttt{Mismatch}. Dies ist damit begründet, dass der \texttt{Mismatch} in den letzten Pixeln liegt\footnote{Für die Messungen wird ein \texttt{Mismatch} am Ende einer Zeile durch $0 1 0$ erzeugt.} und nicht eher abgebrochen werden kann, sondern immer alle $n*n$ Felder überprüft werden müssen. 
 Neben dem bloßen Erkennen, ob es sich um weiße oder schwarze Pixel handelt, muss bei einem \texttt{Mismatch} wenigstens ein ausschließendes Muster von \autoref{fig:mismatches} überprüft worden sein, dieser Mehraufwand ist der Grund weshalb \texttt{Mismatch} ein schlechteres Laufzeitverhalten als \texttt{Nothing} in \autoref{ref:p1} aufweist.
 Ferner liefert \texttt{FoundOne} den Worst-Case für beide Messungen, da in beiden Fällen die ausschließenden Muster geprüft werden müssen. 
-Durch die folgendenden Darstellungen (\autoref{ref:n10000} \& \autoref{ref:n40000}) wird das Laufzeitverhalten für ein festes $n$ ersichtlich.
-
-\begin{figure}[t]
+Durch die folgendenden Darstellungen (\autoref{ref:n10000} und \autoref{ref:n40000}) wird das Laufzeitverhalten für ein festes $n$ ersichtlich.
+\begin{figure}[htb]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
 [           scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
-            ylabel=Time in s,
+            ylabel=Zeit in s,
             xlabel=p,
             legend style={at={(1.1,-0.1)}, anchor=north}
 ]
@@ -164,7 +169,7 @@ Durch die folgendenden Darstellungen (\autoref{ref:n10000} \& \autoref{ref:n4000
 [           scale=0.9,
             grid = major,
             grid style={dashed, gray!30},
-            ylabel=Time in s,
+            ylabel=Zeit in s,
             xlabel=p,
             legend style={at={(5.1,-0.1)}, anchor=north}
 ]
@@ -185,9 +190,10 @@ Außerdem kann man erkennen, dass der sequentielle Fall wieder die besten Laufze
 Betrachtet man die unterschiedlichen Ergebnisse bildet \texttt{FoundOne} wieder den Worst-Case. 
 Der Best-Case für $p=1$ kann diesmal durch \texttt{Mismatch} gezeigt werden, da ein vorzeitigen Abbruch durch das Vorkommen eines \texttt{Mismatches} in Zeile 4000 erreicht wird. 
 Im parallelen Fall kann nicht eher abgebrochen werden, da erst alle Teilbilder durchsucht werden müssen, so dass ab eine Prozessorzahl von 2 \texttt{Nothing} und \texttt{Mismatch} das gleiche Laufzeitverhalten besitzen.
+
 \subsection{Speedup und Effizienz}
 Die folgenden Abbildungen beziehen sich auf die Auswertungen zum Speedup und zur Effizienz. 
-\begin{figure}[h]
+\begin{figure}[htb]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
@@ -228,6 +234,7 @@ Die folgenden Abbildungen beziehen sich auf die Auswertungen zum Speedup und zur
 	\label{ref:speedUpn10000}
 \end{minipage}
 \end{figure}
+
 Wie schon bei der Untersuchtung des Laufzeitverhaltens bemerkt wurde, verschlechtert sich die Laufzeit für den parallelen Fall enorm. 
 Dieses Verhalten wird durch \autoref{ref:speedUpn10000} und \autoref{ref:speedUpn40000} bestätigt. 
 Anstatt einen linearen Anstieg anzustreben, ähnelt die Funktion einer Hyperbel mit indirekter Proportionalität für alle Messungen. 
@@ -237,7 +244,7 @@ So dass der eigentliche Best-Case nun den schlechtesten Speedup aufweist, da der
 Entsprechend verhält sich der Average-Case und Worst-Case. Folglich konnte gezeigt werden, dass die Problemstellung nicht geeignet ist für die Parallelisierung durch die anfallende Kommunikation. 
 
 Im Anschluss wird näher auf die Effizienz eingegangen.
-\begin{figure}[h]
+\begin{figure}[!ht]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
 \begin{axis}
@@ -279,7 +286,6 @@ Im Anschluss wird näher auf die Effizienz eingegangen.
 \end{minipage}
 \end{figure}
 
-
 Ähnlich zum Speedup weichen die Werte der Effizienz enorm zu einem normal parallelisierten Programm ab. 
 Somit kann nur für den sequentiellen Fall gezeigt werden, dass die Effizienz bei den Optimalwert $1$ liegt, wodurch niemals eine Verbesserung durch eine Parallelisierung für diese Problemstellung stattfindet. Außerdem erkennt man wie beim Speedup für größere $n$ (\autoref{ref:Effizienzn40000}) einen stärkeren Abfall als für kleinere $n$, dies ist wieder durch den stärker ins Gewicht fallenden Kommunikationsoverhead zu begründen.
 
@@ -294,7 +300,6 @@ Da sehr geringe Werte für Speedup und Effizienz ermittelt worden, wurde bewiese
 Folglich wird für die Erkennung von Rechteckmustern die sequentielle Variante empfohlen.
 
 \pagebreak
-
 \section{Projektaufgabe 2: Numerische Integration mittels Parabelformel}
 \lstset{language=Fortran,frame=none, keepspaces=false,tabsize=1,captionpos=b, basicstyle=\scriptsize,showstringspaces=false,breaklines=true}  
 In diesem Abschnitt wird auf die Projektaufgabe 2 eingegangen.
@@ -387,10 +392,7 @@ Die Variable \textbf{h} gibt dabei die allgemeine Schrittweite an und \textbf{st
 
 Nach erfolgter Berechnung sendet jeder Prozessor sein Ergebnis an den Master (falls der Prozessor nicht selbst der Master ist)
 
-\subsection{Ergebnisse}
-\label{ref:ergebnisse}
-
-\subsubsection{Testfunktionen}
+\subsection{Ergebnisse der Testfunktionen}
 In diesem Unterabschnitt wird auf die erzielten Ergebnisse der Testfunktion 1 und 2 hinsichtlich ihrer Näherung zu Pi eingegangen.
 Als Referenzwert für die Testunfktionen wurde Pi mit \textbf{3.141592653589793} verwendet.
 Angemerkt sei, dass die Prozessoranzahl 6 ausgeschlossen wurde, da dadurch bei Division durch die 2er Potenz von \textbf{n}, eine nicht ganzzahliges lokales \textbf{n} enstehen würde.
@@ -402,10 +404,10 @@ Wie in der Tabelle zu sehen ist liefert die Testfunktion 2 schneller bessere Nä
 Ein Grund dafür, dass die Funktion 1 schlechte Näherungswerte liefert, liegt unter Anderem an der Oberegrenze.
 Diese Obergrenze ist Pi selbst.
 Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2, daher benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
-\begin{center}
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 	\pgfplotstabletypeset[col sep=space
+	,use comma
 	,every head row/.style={before row={\hline},after row=\hline}
 	,every last row/.style={after row=\hline}
 	,every even column/.style={column type/.add={|}{|}}
@@ -426,16 +428,15 @@ Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei
 	\label{ref:piN}
 \end{minipage}
 \end{figure}
-\end{center}
 Die \autoref{ref:piN} zeigt ebenfalls die Abweichung, aber hier wird ein konstantes \textbf{n} von 32768 verwendet und die Prozessoranzahl variiert.
 Das die Näherungswerte sich in Abhängigkeit von der verwendeten Prozessorzahl unterscheiden ist damit begründet, dass die Parabelformel mittlere Teilstücke mit einem Faktor von 4 beziehungsweise 2 wichtet.
 
-\subsubsection{Laufzeitverhalten}
+\subsection{Laufzeitverhalten}
 Im vorherigen Abschnitt wurden die Ergebnisse der Testfunktionen hinsichtlich Pi untersucht und nun wird eine Betrachtung hinsichtlich der Laufzeit durchgeführt.
 
 Wie in der \autoref{ref:Laufzeitn} zu sehen ist, lohnt sich für diese Aufgabenstellung eine Parallelisierung.
-Mit steigendem p verringert sich die Laufzeit im Vergleich zum sequenziellen Fall.
-Es ist zu vermuten das mit steigendem p der Laufzeitgewinn immer schwächer wird und ab einem gewissen Punkt wieder eine Laufzeitverschlechterung eintritt.
+Mit steigendem \textbf{p} verringert sich die Laufzeit im Vergleich zum sequenziellen Fall.
+Es ist zu vermuten das mit steigendem \textbf{p} der Laufzeitgewinn immer schwächer wird und ab einem gewissen Punkt wieder eine Laufzeitverschlechterung eintritt.
 Begründet ist dies mit steigendem Kommukationsoverhead bei einer steigendem Prozessoranzahl.
 Bei der hier verwendeten geringen Anzahl an Prozessoren mit einem Maximum von 8, spielt der Kommunikationsoverhead eine eher untergeordnete Rolle.
 Zusätzlich ist zu sehen, dass die Testfunktion 1 langsamer ist als die Testfunktion 2 ist.
@@ -480,12 +481,20 @@ Es wird vermutet, dass die Berechnung von Sinus in der Testfunktion 1 äufwändi
 \end{minipage}
 \end{figure}
 
-%TODO Laufzeit p
+Wie in der \autoref{ref:LaufzeitP} zu sehen ist, steigt mit wachsendem \textbf{n} und konstantem \textbf{p} die Laufzeit beider Algorithmen an.
+Es ist festzustellen, dass die Testfunktion 1 dabei einen stärkeren Anstieg aufweißt als Testfunktion 2.
+Die Ergebnisse entsprechen dem erwarteten Verhalten, denn mit steigendem n sollte bei diesem Problem die Laufzeit linear steigen.
 
-\subsubsection{Speedup und Effizienz}
-%TODO
+\subsection{Speedup und Effizienz}
+In diesem Abschnitt sollen nun Speedup und Effizienz für die Testfunktionen 1 und 2 betrachtet werden.
 
-
+In der \autoref{ref:speedF1} ist der ermittelte Speedup für die Tesfunktion 1 mit zwei verschieden Werten für \textbf{n} zu sehen.
+Bei einem großem \textbf{n} ist zu sehen, dass ein deutlich beserer Speedup erzielt wird, als bei einem kleineren \textbf{n}.
+Dieses Verhalten wird auch in der Funktion 2 nachgewiesen, wie man in der \autoref{ref:speedF2} sehen kann.
+Bei einem kleinen \textbf{n} flacht der Speedup bedeutend schneller ab.
+Bedingt ist dies dadurch, dass bei einem kleineren \textbf{n} die Laufzeit für die Kommunikation und Summieren der Ergebnisse markanter in die Berechnung eingeht.
+Dennoch lässt sich ssgen, dass bei dieser Aufgabe bei maximal 8 Prozessoren ein sehr guter Speedup erreicht werden kann.
+Dies gilt sowohl für Funktion 1 als auch Funktion 2, wobei Funktion 2 einen etwas schlechteren Speedup als Funktion 1 erreicht.
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
@@ -529,6 +538,13 @@ Es wird vermutet, dass die Berechnung von Sinus in der Testfunktion 1 äufwändi
 \end{minipage}
 \end{figure}
 
+Nun betrachten wir die Funktionen hinsichtlich ihrer Effizienz.
+In der \autoref{ref:EffizienzF1} und \autoref{ref:EffizienzF2} ist die Effizienz für die Funktion 1 sowie 2 dargestellt.
+Aufgrund das bei einem großen \textbf{n} ein besserer Speedup erzielt wird, werden bei Funktion 1 und 2 relativ hohe Effizienzwerte erreicht.
+Es ist außerdem zu sehen, dass Funktion 1 im Allgemeinen effizienter ist als Funktion 2.
+Außerdem wird die höchste Effizienz bei der Parallelisierung mit 2 Prozessoren erreicht.
+Dies gilt für Funktion 1 und Funktion 2 gleichermaßen.
+Bei einem kleineren \textbf{n} sinkt die Effizienz bedeutend schneller als bei einem großen, wobei auch hier Funktion 1 im Allgemeinen besser ist.
 \begin{figure}[h]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
@@ -573,16 +589,12 @@ Es wird vermutet, dass die Berechnung von Sinus in der Testfunktion 1 äufwändi
 
 \subsection{Fazit}
 \label{ref:fazit}
-Kommunikationsoverhead spielt hier eine untergeordnete Rolle, da Minimum an Kommunikation zur Berechnung notwendig ist.
-%TODO
-Weiterhin lohnt sich die Parallelisierung,..
+Die Problemstellung der numerischen Integration mittels Parabelformel konnte erfolgreich in Fortran umgesetzt werden.
+Laufzeitmessungen sowie Betrachtung von Speedup und Effizienz ergaben, dass eine Parallelisierung für diese Aufgabenstellung sehr geeignet ist.
+Aufgrund des geringen Kommunikationsoverheadt, fällt dieser bei der geringen Prozessoranzahl ($\textbf{p} \le 8$) kaum ins Gewicht, falls das \textbf{n} ausreichend groß ist.
+Bei einem kleinen \textbf{n} ist dieser Kommunikationsoverhead mit Ergebnisssumation doch zu spüren wie die Betrachtung des Speedups ergab.
 
-
-%\appendix
-%\section{Quellcode Aufgabe 1}
-%
-%\section{Quellcode Aufgabe 2}
-%\lstset{language=Fortran,numbers=left, keepspaces=false, basicstyle=\footnotesize,showstringspaces=false} 
-%\lstinputlisting[]{../integration/A2star.f}
+Zusätzlich ist festzuhalen, dass die Funktion 2 bessere Näherungswerte für Pi liefert als die Funktion 1.
+Obwohl die Funktion 2 ein besseres Laufzeitverhalten als Funktion 1 besitzt, ist Funktion 1 doch etwas effizienter bei der Parallelisierung.
 
 \end{document}
