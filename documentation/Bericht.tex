@@ -296,7 +296,7 @@ Im Anschluss wird näher auf die Effizienz eingegangen.
 \end{figure}
 
 Ähnlich zum Speedup weichen die Werte der Effizienz enorm zu einem gut parallelisierbaren Programm ab. 
-Wie man durch die Darstellungen sieht sind alle Effizienzwerte für den parallelen Fall sehr gering (Effizienz von $0,2$\% bis $0,01$\%).
+Wie man durch die Darstellungen sieht sind alle Effizienzwerte für den parallelen Fall sehr gering (Effizienz von $0,2$\% bis $0,004$\%).
 Hierdurch kann gezeigt werden, dass durch die Parallelisierung niemals eine Verbesserung erreicht wird. 
 Außerdem erkennt man wie beim Speedup für größere $n$ (\autoref{ref:Effizienzn40000}) einen stärkeren Abfall als für kleinere $n$.
 Dies ist wieder durch den stärker ins Gewicht fallenden Kommunikationsoverhead zu begründen.
@@ -309,7 +309,7 @@ Außerdem gibt es für die sequentielle Suche die Möglichkeit vorzeitig abzubre
 Anders als im parallelen Fall, da jeder Prozess sein Teilbild entsprechend durchsuchen muss.
 Durch die Untersuchungen von variierenden $n$ konnte gezeigt werden, dass sich die Laufzeit quadratisch mit steigenden $n$ verschlechtert für alle $p$.
 Folglich verschlechtert sich mit steigendem $n$ die Laufzeit des parallelen Programmes noch mehr.
-Da sehr geringe Werte für Speedup und Effizienz ermittelt worden, wurde bewiesen dass die Problemstellung sich nicht für die Parallelisierung eignet.
+Da sehr geringe Werte für Speedup und Effizienz ermittelt worden, wurde bewiesen, dass die Problemstellung sich nicht für die Parallelisierung eignet.
 Folglich wird für die Erkennung von Rechteckmustern die sequentielle Variante empfohlen.
 
 \pagebreak
@@ -322,7 +322,7 @@ Anschließend erfolgt die Auswertung und im letzten Abschnitt wird ein Fazit gez
 
 \subsection{Verwendung}
 \label{ref:verwendung}
-Der Quellcode kann mit dem Aufruf von 1 auf dem MC-3-System kompiliert und mit 2 ausgeführt werden:
+Der Quellcode kann mit dem Aufruf von \texttt{1} auf dem MC-3-System kompiliert und mit \texttt{2} ausgeführt werden:
 \begin{itemize}
 	\item[1.] f77.px -o A2star.px A2star.f
 	\item[2.] run -f0 4 2 A2star.px \textbf{FUNCTION} \textbf{N}
@@ -330,15 +330,15 @@ Der Quellcode kann mit dem Aufruf von 1 auf dem MC-3-System kompiliert und mit 2
 Für das Programm können Kommandozeilenargumente zur Auswahl der Testfunktion und die Größe der zu berechnenden Teilstücke des Integrals angegeben werden.
 \paragraph{FUNCTION:}
 Das Programmargument \textbf{FUNCTION} entscheidet darüber, welche der beiden gegebenen Testfunktionen verwendet wird.
-Als gültige Eingabe wird 1 für Funktion 1 und 2 für Funktion 2 erwartet.
+Als gültige Eingabe wird \texttt{1} für Funktion 1 und \texttt{2} für Funktion 2 erwartet.
 \paragraph{N:}
 Das zweite Programmargument \textbf{N} gibt die 2er Potenz der zu berechnenden Teilstücke des Integrals an.
-Je größer das \textbf{N}, umso genauer wird das berechnete PI.
-De höchstmöglichste zulässige Eingabe ist 20, das sind 1048576 zu berechnende Teilstücke.
+Je größer das \textbf{N} umso genauer wird das berechnete PI.
+De höchstmöglichste zulässige Eingabe ist 20, dass sind 1048576 zu berechnende Teilstücke.
 Diese Vorgehensweise soll zum Einen sicher stellen, dass \textbf{N} stets durch 2 Teilbar ist und zum Anderen das Laufzeitmessen vereinfachen, da ein exponentielles Wachstum vorliegt.
 Sollte kein Programmargument angeben werden, so wird intern die Funktion 1 mit $n = 2^{15} = 32768$ verwendet.
 
-Weiterhin muss die Divison von n durch Prozessorzahl ganzahlig sein, damit stets gewährleistet ist, dass die zu berechnende Anzahl an Teilstücke pro Prozessor eine ganzzahlige ist.
+Weiterhin muss die Divison von \textbf{n} durch Prozessorzahl ganzahlig sein, damit stets gewährleistet ist, dass die zu berechnende Anzahl an Teilstücke pro Prozessor eine ganzzahlige ist.
 
 \subsection{Realisierung}
 \label{ref:realisierung}
@@ -350,9 +350,9 @@ Bedingt durch die Realisierung als Kommandozeilenparameter, entfällt der Kommun
 Daher kennen alle Prozessoren \textbf{N} sowie die Testfunktion beim Programmstart.
 
 Die Prozessoren können explizit ihre eigenen Bereich für die Teilstücke bestimmen und somit die numerische Berechnung durchführen.
-Nach Abschluss der Berechnungen, werden diese an den Master-Prozessor gesendet.
+Nach Abschluss der Berechnungen werden diese an den Master-Prozessor gesendet.
 Der Master-Prozessor summiert die Ergebnisse der anderen Prozessoren zu seinem eigenem Ergebnis auf und wendet die Multiplikation $\frac{\textbf{h}}{3}$ auf das Ergebnis an.
-Im Anschluss werden die Ergebnisse wie Referenzwert-PI, Berechnetes-PI, Abweichung und Laufzeit (nicht in Abbildung dargestellt) ausgegeben. 
+Im Anschluss werden die Ergebnisse wie \texttt{Referenzwert-PI}, \texttt{Berechnetes-PI}, \texttt{Abweichung} und \texttt{Laufzeit} (nicht in Abbildung dargestellt) ausgegeben. 
 Die \autoref{ref:main} zeigt dies.
 \begin{figure}[h]
 \hrulefill
@@ -364,8 +364,9 @@ Die \autoref{ref:main} zeigt dies.
 		summe = integral
 		do i=1,(np-1)
 			call recv(topid,links(i),integral,8)
-			summe = summe + h/3 * integral
+			summe = summe + integral
 		enddo
+		summe = h/3 * summe
 	else
 		call send(topid, link,integral,8)
 	endif
@@ -397,7 +398,7 @@ Die \autoref{ref:main} zeigt dies.
 
 Die numerische Berechnung des Integrals wird durch jeden Prozessor ausgeführt, aber jeder Prozessor führt nur einen Teil der kompletten Berechnung aus.
 Die eigentliche Berechnung ist in der \autoref{ref:intervall} zu sehen.
-Zunächst berechnet jeder Prozessor die Anzahl der durchzuführenden Berechnungen, als lokales \textbf{n} (\textbf{nL}).
+Zunächst berechnet jeder Prozessor die Anzahl der durchzuführenden Berechnungen als lokales \textbf{n} (\textbf{nL}).
 Im Anschluss werden Startwert (\textbf{aL}) und Endwert (\textbf{bL}) ermittelt.
 Die Funktionswerte von \textbf{aL} und \textbf{bL} der Testfunktion werden addiert und in einer Summe gespeichert.
 Im Anschluss werden die Zwischenstücke mit entsprechendem Faktor berechnet und ebenfalls summiert.
@@ -408,15 +409,16 @@ Nach erfolgter Berechnung sendet jeder Prozessor sein Ergebnis an den Master (fa
 \subsection{Ergebnisse der Testfunktionen}
 In diesem Unterabschnitt wird auf die erzielten Ergebnisse der Testfunktion 1 und 2 hinsichtlich ihrer Näherung zu Pi eingegangen.
 Als Referenzwert für die Testunfktionen wurde Pi mit \textbf{3.141592653589793} verwendet.
-Angemerkt sei, dass die Prozessoranzahl 6 ausgeschlossen wurde, da dadurch bei Division durch die 2er Potenz von \textbf{n}, eine nicht ganzzahliges lokales \textbf{n} enstehen würde.
+Angemerkt sei, dass die Prozessoranzahl 6 ausgeschlossen wurde, da dadurch bei Division durch die 2er Potenz von \textbf{n} ein nicht ganzzahliges lokales \textbf{n} enstehen würde.
 Durch das lokale \textbf{n}, würde zwar ein Näherungswert zu Pi bestimmt, aber dieses besitzt eine deutlich größere Abweichungen im Vergleich zu einer korrekten Eingabe.
-Deswegen wird beim Programmstart diese Eingabe überprüft und ggf. bei falscher Eingabe das Programm beendet.
+Deswegen wird beim Programmstart diese Eingabe überprüft und gegebenenfalls bei falscher Eingabe das Programm beendet.
 
 Die \autoref{ref:piP} zeigt die Abweichung zum Referenzwert von Pi bei einer konstanten Prozessoranzahl von 8 und einem sich verändernden \textbf{n}.
 Wie in der Tabelle zu sehen ist liefert die Testfunktion 2 bessere Näherungswerte als Funktion 1.
 Ein Grund dafür, dass die Funktion 1 schlechte Näherungswerte liefert, liegt unter Anderem an der Oberegrenze.
 Diese Obergrenze ist Pi selbst.
-Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2, daher benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
+Zusätzlich sind in der Funktion 1 die Schrittweiten bedeutend größer, als bei der Funktion 2.
+Deswegen benötigt die Funktion ein größeres \textbf{n} um mehr Teilstücke berechnen zu können und somit ein genaueres Ergebnis zu liefern.
 \begin{figure}[h]
 \begin{minipage}{0.45\textwidth}
 	\pgfplotstabletypeset[col sep=space
@@ -447,7 +449,7 @@ Das die Näherungswerte sich in Abhängigkeit von der verwendeten Prozessorzahl 
 \subsection{Laufzeitverhalten}
 Im vorherigen Abschnitt wurden die Ergebnisse der Testfunktionen hinsichtlich Pi untersucht und nun wird eine Betrachtung hinsichtlich der Laufzeit durchgeführt.
 
-Wie in der \autoref{ref:Laufzeitn} zu sehen ist, lohnt sich für diese Aufgabenstellung eine Parallelisierung.
+Wie in der \autoref{ref:Laufzeitn} zu sehen ist lohnt sich für diese Aufgabenstellung eine Parallelisierung.
 Mit steigendem \textbf{p} verringert sich die Laufzeit im Vergleich zum sequenziellen Fall.
 Es ist zu vermuten das mit steigendem \textbf{p} der Laufzeitgewinn immer schwächer wird und ab einem gewissen Punkt wieder eine Laufzeitverschlechterung eintritt.
 Begründet ist dies mit steigendem Kommukationsoverhead bei einer steigendem Prozessoranzahl.
@@ -600,7 +602,6 @@ Bei einem kleineren \textbf{n} sinkt die Effizienz bedeutend schneller als bei e
 	\label{ref:EffizienzF2}
 \end{minipage}
 \end{figure}
-
 \subsection{Fazit}
 \label{ref:fazit}
 Die Problemstellung der numerischen Integration mittels Parabelformel konnte erfolgreich in Fortran umgesetzt werden.
@@ -609,9 +610,9 @@ Aufgrund des geringen Kommunikationsoverhead fällt dieser bei der geringen Proz
 Dies liegt daran, dass die Laufzeit für Kommunikation und Summation im Vergleich zur Berechnung stärker ins Gewicht fällt.
 
 Zusätzlich ist festzuhalten, dass die Funktion 2 bessere Näherungswerte für Pi liefert als die Funktion 1.
-Obwohl die Funktion 2 ein besseres Laufzeitverhalten als Funktion 1 besitzt, ist Funktion 1 doch etwas effizienter bei der Parallelisierung.
+Obwohl die Funktion 2 ein besseres Laufzeitverhalten als Funktion 1 besitzt ist Funktion 1 doch etwas effizienter bei der Parallelisierung.
 Denn die Funktion 2 ist bereits sehr schnell und erreicht durch die Parallisierung einen flachereren Anstieg der Laufzeit als Funktion 1.
 Der Gewinn der Parallelisierung ist folglich für Funktion 1 größer.
-Es wird dennoch empfohlen Funktion 2 zu verwenden, aufgrund der besseren Näherungswerte und der Allgemeinen besseren Laufzeit.
+Es wird dennoch empfohlen Funktion 2 zu verwenden, aufgrund der besseren Näherungswerte für ein kleines \textbf{n} und der Allgemeinen besseren Laufzeit.
 
 \end{document}
