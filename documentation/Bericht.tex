@@ -96,8 +96,15 @@ Modus 0 hingegen interpretiert nur die ersten drei Koordinatenpaare als Ortsvekt
 Es ist notwendig, dass dabei die Reihenfolge: obere Ecke links, obere Ecke rechts und untere Ecke links eingehalten wird.
 Durch die angegebenen Kodierungen (Modus 1 und 0) ist es möglich sehr große Digitalbilder mit der Anwendung zu testen, ohne dass diese tatsächlich  als physisch gespeicherte Dateien existieren müssen. 
 Im Gegensatz dazu kann durch Modus 2 direkt die Matrix eingegeben werden, dieser Modus findet vorallem für kleinere $n$ Anwendung. 
-Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden.
-%TODO Bespiel-Abbildung mit allen Modi hinzufügen
+Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vorher betrachteten Fällen \texttt{Nothing}, \texttt{Mitmatch} und \texttt{FoundOne} für kleine und große $n$ erzeugt werden. Im folgenden kann sieht man den Inhalt von Beispiel-Konfigurationsfiles.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale=0.4]{configfiles.png}
+    \caption{Beispiel-Konfigurationen für die Bilderstellung}
+    \label{fig:configfiles}
+\end{figure}
+
 \subsection{Laufzeitverhalten}
 Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ bis maximal 44 und feste $p$ mit variierende $n$ bis maximal 40000 betrachtet.
 \begin{figure}[htb]
