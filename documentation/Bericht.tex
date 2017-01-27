@@ -106,7 +106,7 @@ Durch das Konfigurationsfile können somit sehr leicht Digitalbilder mit den vor
 \end{figure}
 
 \subsection{Laufzeitverhalten}
-Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ bis maximal 44 und feste $p$ mit variierende $n$ bis maximal 40000 betrachtet.
+Für die Untersuchungen des Laufzeitverhaltens werden im folgenden feste $n$ mit variierenden $p$ bis maximal 44 und feste $p$ mit variierende $n$ bis maximal 40000 betrachtet. Da das Maximum für das Quadratische Raster in etwa bei $n=45000$ liegt, können dennoch Aussagen über die Laufzeit getroffen werden. Das Maximum begründet sich an der Obergrenze der zu sendenden Datenpackete des Datentyps \texttt{MPI\_Short} über den Befehl \texttt{MPI\_Scatter}.
 \begin{figure}[htb]
 \begin{minipage}{0.49\textwidth}
 \begin{tikzpicture}
