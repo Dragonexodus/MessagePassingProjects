@@ -206,7 +206,7 @@ Außerdem kann man erkennen, dass der sequentielle Fall wieder die besten Laufze
 Betrachtet man die unterschiedlichen Ergebnisse bildet \texttt{FoundOne} wieder den Worst-Case. 
 Der Best-Case für $p=1$ kann diesmal durch \texttt{Mismatch} gezeigt werden, da ein vorzeitiger Abbruch durch das Vorkommen eines \texttt{Mismatches} in Zeile 4000 erreicht wird. 
 Im parallelem Fall kann nicht eher abgebrochen werden, da erst alle Teilbilder durchsucht werden müssen, so dass ab einer Prozessorzahl von 2 \texttt{Nothing} und \texttt{Mismatch} das gleiche Laufzeitverhalten besitzen.
-%TODO ab hier weiter lesen
+
 \subsection{Speedup und Effizienz}
 Die folgenden Abbildungen beziehen sich auf die Auswertungen zum Speedup und zur Effizienz. 
 \begin{figure}[htb]
@@ -340,7 +340,7 @@ Das Programmargument \textbf{FUNCTION} entscheidet darüber, welche der beiden g
 Als gültige Eingabe wird \texttt{1} für Funktion 1 und \texttt{2} für Funktion 2 erwartet.
 \paragraph{N:}
 Das zweite Programmargument \textbf{N} gibt die 2er Potenz der zu berechnenden Teilstücke des Integrals an.
-Je größer das \textbf{N} umso genauer wird das berechnete PI.
+Je größer das \textbf{N} umso genauer wird das berechnete Pi.
 De höchstmöglichste zulässige Eingabe ist 20, dass sind 1048576 zu berechnende Teilstücke.
 Diese Vorgehensweise soll zum Einen sicher stellen, dass \textbf{N} stets durch 2 Teilbar ist und zum Anderen das Laufzeitmessen vereinfachen, da ein exponentielles Wachstum vorliegt.
 Sollte kein Programmargument angeben werden, so wird intern die Funktion 1 mit $n = 2^{15} = 32768$ verwendet.
@@ -359,7 +359,7 @@ Daher kennen alle Prozessoren \textbf{N} sowie die Testfunktion beim Programmsta
 Die Prozessoren können explizit ihre eigenen Bereich für die Teilstücke bestimmen und somit die numerische Berechnung durchführen.
 Nach Abschluss der Berechnungen werden diese an den Master-Prozessor gesendet.
 Der Master-Prozessor summiert die Ergebnisse der anderen Prozessoren zu seinem eigenem Ergebnis auf und wendet die Multiplikation $\frac{\textbf{h}}{3}$ auf das Ergebnis an.
-Im Anschluss werden die Ergebnisse wie \texttt{Referenzwert-PI}, \texttt{Berechnetes-PI}, \texttt{Abweichung} und \texttt{Laufzeit} (nicht in Abbildung dargestellt) ausgegeben. 
+Im Anschluss werden die Ergebnisse wie \texttt{Referenzwert-Pi}, \texttt{Berechnetes-Pi}, \texttt{Abweichung} und \texttt{Laufzeit} (nicht in Abbildung dargestellt) ausgegeben. 
 Die \autoref{ref:main} zeigt dies.
 \begin{figure}[h]
 \hrulefill
